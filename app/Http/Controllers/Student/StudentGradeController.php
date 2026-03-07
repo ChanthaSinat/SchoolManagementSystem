@@ -16,7 +16,20 @@ class StudentGradeController extends Controller
         $enrollment = Enrollment::where('student_id', $student->id)
             ->where('status', 'active')
             ->with(['schoolClass.academicYear', 'section'])
-            ->firstOrFail();
+            ->first();
+
+        if (! $enrollment) {
+            return view('student.grades.index', [
+                'enrollment' => null,
+                'grades' => collect(),
+                'subjectStats' => collect(),
+                'overallAverage' => null,
+                'overallLetter' => '—',
+                'passingCount' => 0,
+                'failingCount' => 0,
+                'chartData' => ['labels' => [], 'datasets' => []],
+            ]);
+        }
 
         $grades = Grade::where('student_id', $student->id)
             ->where('school_class_id', $enrollment->school_class_id)

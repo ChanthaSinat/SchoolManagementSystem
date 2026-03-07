@@ -73,7 +73,7 @@ class AttendanceController extends Controller
         $sectionId = $request->query('section_id');
         $date = $request->query('date');
 
-        if (! $classId || ! $sectionId || $date) {
+        if (! $classId || ! $sectionId || ! $date) {
             return redirect()->route('teacher.attendance.index')
                 ->with('error', 'Please select class, section, and date.');
         }

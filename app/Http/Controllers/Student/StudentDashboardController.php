@@ -17,7 +17,22 @@ class StudentDashboardController extends Controller
         $enrollment = Enrollment::where('student_id', $student->id)
             ->where('status', 'active')
             ->with(['schoolClass', 'section'])
-            ->firstOrFail();
+            ->first();
+
+        // No active enrollment: show empty dashboard
+        if (! $enrollment) {
+            return view('student.dashboard', [
+                'enrollment' => null,
+                'overallAvg' => 0,
+                'overallLetter' => '—',
+                'attendanceRate' => 0,
+                'todaySchedule' => collect(),
+                'recentGrades' => collect(),
+                'monthPresent' => 0,
+                'monthAbsent' => 0,
+                'recentAttendance' => collect(),
+            ]);
+        }
 
         // Attendance
         $totalDays = Attendance::where('student_id', $student->id)->count();

@@ -15,7 +15,21 @@ class StudentAttendanceController extends Controller
         $student = auth()->user();
         $enrollment = Enrollment::where('student_id', $student->id)
             ->where('status', 'active')
-            ->firstOrFail();
+            ->first();
+
+        if (! $enrollment) {
+            return view('student.attendance.index', [
+                'enrollment' => null,
+                'attendances' => collect(),
+                'byMonth' => collect(),
+                'attendanceByDate' => [],
+                'total' => 0,
+                'present' => 0,
+                'absent' => 0,
+                'late' => 0,
+                'rate' => 0,
+            ]);
+        }
 
         $attendances = Attendance::where('student_id', $student->id)
             ->where('school_class_id', $enrollment->school_class_id)

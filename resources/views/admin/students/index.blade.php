@@ -15,7 +15,7 @@
             <button class="bg-white p-2.5 rounded-xl shadow-sm border border-slate-200 text-slate-600 hover:text-blue-600 transition-all hover:shadow-md">
                 <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" x2="12" y1="15" y2="3"/></svg>
             </button>
-            <a href="#" class="bg-blue-600 text-white px-6 py-3 rounded-xl text-sm font-bold hover:bg-blue-700 shadow-lg shadow-blue-600/20 active:scale-95 transition-all flex items-center gap-2">
+            <a href="{{ route('admin.students.create') }}" class="bg-blue-600 text-white px-6 py-3 rounded-xl text-sm font-bold hover:bg-blue-700 shadow-lg shadow-blue-600/20 active:scale-95 transition-all flex items-center gap-2">
                 <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><line x1="12" x2="12" y1="5" y2="19"/><line x1="5" x2="19" y1="12" y2="12"/></svg>
                 Add Student
             </a>
@@ -110,7 +110,7 @@
                                     </div>
                                     <h3 class="text-lg font-black text-slate-800">No Students Registered</h3>
                                     <p class="text-slate-500 text-sm max-w-xs mt-2">The student database is currently empty.</p>
-                                    <a href="#" class="mt-6 bg-blue-600 text-white px-8 py-3.5 rounded-2xl text-sm font-bold shadow-lg shadow-blue-100 hover:bg-blue-700 transition-all">Enroll First Student</a>
+                                    <a href="{{ route('admin.students.create') }}" class="mt-6 bg-blue-600 text-white px-8 py-3.5 rounded-2xl text-sm font-bold shadow-lg shadow-blue-100 hover:bg-blue-700 transition-all">Enroll First Student</a>
                                 </div>
                             </td>
                         </tr>

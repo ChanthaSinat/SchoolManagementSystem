@@ -55,6 +55,88 @@
                         <x-text-input id="password_confirmation" name="password_confirmation" type="password" class="mt-1 block w-full" autocomplete="new-password" />
                     </div>
 
+                    @if ($roleLabel === 'Student' && isset($schoolClasses))
+                        <div class="pt-6 border-t border-gray-200 space-y-4">
+                            <h3 class="text-sm font-semibold text-gray-800">{{ __('Class assignment') }}</h3>
+                            <p class="text-xs text-gray-500">{{ __('Assign this student to a class and section. Leave empty to remove from class.') }}</p>
+                            <div>
+                                <x-input-label for="school_class_id" :value="__('Class')" />
+                                <select id="school_class_id" name="school_class_id" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 text-sm">
+                                    <option value="">{{ __('— Select class —') }}</option>
+                                    @foreach ($schoolClasses as $class)
+                                        <option value="{{ $class->id }}" data-sections="{{ $class->sections->map(fn($s) => ['id' => $s->id, 'name' => $s->name])->values()->toJson() }}"
+                                            {{ old('school_class_id', $enrollment?->school_class_id ?? '') == $class->id ? 'selected' : '' }}>
+                                            {{ $class->name }}
+                                        </option>
+                                    @endforeach
+                                </select>
+                                <x-input-error class="mt-2" :messages="$errors->get('school_class_id')" />
+                            </div>
+                            <div>
+                                <x-input-label for="section_id" :value="__('Section')" />
+                                <select id="section_id" name="section_id" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 text-sm" data-selected="{{ old('section_id', $enrollment?->section_id ?? '') }}">
+                                    <option value="">{{ __('— Select section —') }}</option>
+                                    @if ($enrollment && $enrollment->schoolClass)
+                                        @foreach ($enrollment->schoolClass->sections as $sec)
+                                            <option value="{{ $sec->id }}" {{ old('section_id', $enrollment?->section_id ?? '') == $sec->id ? 'selected' : '' }}>{{ $sec->name }}</option>
+                                        @endforeach
+                                    @endif
+                                </select>
+                                <x-input-error class="mt-2" :messages="$errors->get('section_id')" />
+                            </div>
+                            <div>
+                                <x-input-label for="roll_number" :value="__('Roll number')" />
+                                <x-text-input id="roll_number" name="roll_number" type="number" min="1" class="mt-1 block w-full" :value="old('roll_number', $enrollment?->roll_number ?? '')" />
+                                <x-input-error class="mt-2" :messages="$errors->get('roll_number')" />
+                            </div>
+                            <div>
+                                <x-input-label for="guardian_phone" :value="__('Guardian phone')" />
+                                <x-text-input id="guardian_phone" name="guardian_phone" type="text" class="mt-1 block w-full" :value="old('guardian_phone', $enrollment?->guardian_phone ?? '')" />
+                                <x-input-error class="mt-2" :messages="$errors->get('guardian_phone')" />
+                            </div>
+                        </div>
+                        <script>
+                            (function() {
+                                var classSelect = document.getElementById('school_class_id');
+                                var sectionSelect = document.getElementById('section_id');
+                                if (!classSelect || !sectionSelect) return;
+                                classSelect.addEventListener('change', function() {
+                                    var opt = classSelect.options[classSelect.selectedIndex];
+                                    var sections = opt.getAttribute('data-sections') ? JSON.parse(opt.getAttribute('data-sections')) : [];
+                                    sectionSelect.innerHTML = '<option value="">{{ __("— Select section —") }}</option>';
+                                    sections.forEach(function(s) {
+                                        var o = document.createElement('option');
+                                        o.value = s.id;
+                                        o.textContent = s.name;
+                                        sectionSelect.appendChild(o);
+                                    });
+                                    var selected = sectionSelect.getAttribute('data-selected');
+                                    if (selected) sectionSelect.value = selected;
+                                });
+                                classSelect.dispatchEvent(new Event('change'));
+                            })();
+                        </script>
+                    @endif
+
+                    @if ($roleLabel === 'Teacher' && isset($schoolClasses))
+                        <div class="pt-6 border-t border-gray-200 space-y-4">
+                            <h3 class="text-sm font-semibold text-gray-800">{{ __('Classes assigned') }}</h3>
+                            <p class="text-xs text-gray-500">{{ __('Select which classes this teacher teaches.') }}</p>
+                            <div class="space-y-2 max-h-48 overflow-y-auto border border-gray-100 rounded-lg p-3 bg-gray-50/50">
+                                @foreach ($schoolClasses as $class)
+                                    <label class="flex items-center gap-2 cursor-pointer">
+                                        <input type="checkbox" name="class_ids[]" value="{{ $class->id }}" class="rounded border-gray-300 text-indigo-600 focus:ring-indigo-500"
+                                            {{ in_array($class->id, $teacherClassIds ?? []) ? 'checked' : '' }} />
+                                        <span class="text-sm text-gray-800">{{ $class->name }}</span>
+                                    </label>
+                                @endforeach
+                            </div>
+                            @if ($schoolClasses->isEmpty())
+                                <p class="text-sm text-amber-600">{{ __('No classes created yet. Create classes first.') }}</p>
+                            @endif
+                        </div>
+                    @endif
+
                     <div class="flex items-center justify-between pt-4 border-t border-gray-100">
                         <x-primary-button>{{ __('Save changes') }}</x-primary-button>
                         <a href="{{ route($listRoute) }}" class="text-sm text-gray-600 hover:text-gray-800">{{ __('Cancel') }}</a>

@@ -15,7 +15,7 @@
             <button class="bg-white p-2.5 rounded-xl shadow-sm border border-slate-200 text-slate-600 hover:text-indigo-600 transition-all hover:shadow-md">
                 <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" x2="12" y1="15" y2="3"/></svg>
             </button>
-            <a href="#" class="bg-indigo-600 text-white px-6 py-3 rounded-xl text-sm font-bold hover:bg-indigo-700 shadow-lg shadow-indigo-600/20 active:scale-95 transition-all flex items-center gap-2">
+            <a href="{{ route('admin.teachers.create') }}" class="bg-indigo-600 text-white px-6 py-3 rounded-xl text-sm font-bold hover:bg-indigo-700 shadow-lg shadow-indigo-600/20 active:scale-95 transition-all flex items-center gap-2">
                 <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><line x1="12" x2="12" y1="5" y2="19"/><line x1="5" x2="19" y1="12" y2="12"/></svg>
                 Add Teacher
             </a>
@@ -104,7 +104,7 @@
                                     </div>
                                     <h3 class="text-lg font-black text-slate-800">No Teachers Found</h3>
                                     <p class="text-slate-500 text-sm max-w-xs mt-2">Start by adding your first faculty member to the system.</p>
-                                    <a href="#" class="mt-6 bg-indigo-600 text-white px-6 py-3 rounded-2xl text-sm font-bold shadow-lg shadow-indigo-100 hover:bg-indigo-700 transition-all">Add New Teacher</a>
+                                    <a href="{{ route('admin.teachers.create') }}" class="mt-6 bg-indigo-600 text-white px-6 py-3 rounded-2xl text-sm font-bold shadow-lg shadow-indigo-100 hover:bg-indigo-700 transition-all">Add New Teacher</a>
                                 </div>
                             </td>
                         </tr>

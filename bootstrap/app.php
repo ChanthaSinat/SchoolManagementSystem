@@ -14,6 +14,8 @@ return Application::configure(basePath: dirname(__DIR__))
         $middleware->alias([
             'role.dashboard' => \App\Http\Middleware\RedirectToRoleDashboard::class,
             'role' => \Spatie\Permission\Middleware\RoleMiddleware::class,
+            'role.student' => \App\Http\Middleware\EnsureStudentRole::class,
+            'role.teacher' => \App\Http\Middleware\EnsureTeacherRole::class,
         ]);
     })
     ->withExceptions(function (Exceptions $exceptions): void {

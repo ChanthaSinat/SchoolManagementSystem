@@ -3,11 +3,11 @@
         <div class="flex justify-between h-16">
             <div class="flex">
                 <div class="shrink-0 flex items-center">
-                    @if(auth()->user()->hasRole('admin'))
+                    @if(auth()->user()->role === 'admin' || auth()->user()->hasRole('admin'))
                     <a href="{{ route('admin.dashboard') }}">
                         <x-application-logo class="block h-9 w-auto fill-current text-gray-800" />
                     </a>
-                    @elseif(auth()->user()->hasRole('teacher'))
+                    @elseif(auth()->user()->role === 'teacher' || auth()->user()->hasRole('teacher'))
                     <a href="{{ route('teacher.dashboard') }}">
                         <x-application-logo class="block h-9 w-auto fill-current text-gray-800" />
                     </a>
@@ -19,7 +19,7 @@
                 </div>
 
                 {{-- Admin nav: Dashboard | Teachers | Students --}}
-                @role('admin')
+                @if(auth()->user()->role === 'admin' || auth()->user()->hasRole('admin'))
                 <div class="hidden space-x-8 sm:-my-px sm:ms-10 sm:flex">
                     <x-nav-link :href="route('admin.dashboard')" :active="request()->routeIs('admin.dashboard')">
                         {{ __('Admin Dashboard') }}
@@ -31,10 +31,10 @@
                         {{ __('Students') }}
                     </x-nav-link>
                 </div>
-                @endrole
+                @endif
 
                 {{-- Teacher nav: Dashboard | Attendance | Grades --}}
-                @role('teacher')
+                @if(auth()->user()->role === 'teacher' || auth()->user()->hasRole('teacher'))
                 <div class="hidden space-x-8 sm:-my-px sm:ms-10 sm:flex">
                     <x-nav-link :href="route('teacher.dashboard')" :active="request()->routeIs('teacher.dashboard')">
                         {{ __('Dashboard') }}
@@ -46,10 +46,10 @@
                         {{ __('Grades') }}
                     </x-nav-link>
                 </div>
-                @endrole
+                @endif
 
                 {{-- Student sidebar: Dashboard | My Schedule | My Grades | My Attendance | Settings --}}
-                @role('student')
+                @if(auth()->user()->role === 'student' || auth()->user()->hasRole('student'))
                 <div class="hidden space-x-8 sm:-my-px sm:ms-10 sm:flex">
                     <x-nav-link :href="route('student.dashboard')" :active="request()->routeIs('student.dashboard')">
                         {{ __('Dashboard') }}
@@ -64,7 +64,7 @@
                         {{ __('My Attendance') }}
                     </x-nav-link>
                 </div>
-                @endrole
+                @endif
             </div>
 
             {{-- Settings dropdown (both roles) --}}
@@ -108,22 +108,22 @@
     {{-- Responsive (mobile) menu --}}
     <div :class="{'block': open, 'hidden': ! open}" class="hidden sm:hidden">
         <div class="pt-2 pb-3 space-y-1">
-            @role('admin')
+            @if(auth()->user()->role === 'admin' || auth()->user()->hasRole('admin'))
             <x-responsive-nav-link :href="route('admin.dashboard')" :active="request()->routeIs('admin.dashboard')">{{ __('Admin Dashboard') }}</x-responsive-nav-link>
             <x-responsive-nav-link :href="route('admin.teachers.index')" :active="request()->routeIs('admin.teachers.*')">{{ __('Teachers') }}</x-responsive-nav-link>
             <x-responsive-nav-link :href="route('admin.students.index')" :active="request()->routeIs('admin.students.*')">{{ __('Students') }}</x-responsive-nav-link>
-            @endrole
-            @role('teacher')
+            @endif
+            @if(auth()->user()->role === 'teacher' || auth()->user()->hasRole('teacher'))
             <x-responsive-nav-link :href="route('teacher.dashboard')" :active="request()->routeIs('teacher.dashboard')">{{ __('Dashboard') }}</x-responsive-nav-link>
             <x-responsive-nav-link :href="route('teacher.attendance.index')" :active="request()->routeIs('teacher.attendance.*')">{{ __('Attendance') }}</x-responsive-nav-link>
             <x-responsive-nav-link :href="route('teacher.grades.index')" :active="request()->routeIs('teacher.grades.*')">{{ __('Grades') }}</x-responsive-nav-link>
-            @endrole
-            @role('student')
+            @endif
+            @if(auth()->user()->role === 'student' || auth()->user()->hasRole('student'))
             <x-responsive-nav-link :href="route('student.dashboard')" :active="request()->routeIs('student.dashboard')">{{ __('Dashboard') }}</x-responsive-nav-link>
             <x-responsive-nav-link :href="route('student.timetable')" :active="request()->routeIs('student.timetable')">{{ __('My Schedule') }}</x-responsive-nav-link>
             <x-responsive-nav-link :href="route('student.grades')" :active="request()->routeIs('student.grades')">{{ __('My Grades') }}</x-responsive-nav-link>
             <x-responsive-nav-link :href="route('student.attendance')" :active="request()->routeIs('student.attendance')">{{ __('My Attendance') }}</x-responsive-nav-link>
-            @endrole
+            @endif
         </div>
         <div class="pt-4 pb-1 border-t border-gray-200">
             <div class="px-4">

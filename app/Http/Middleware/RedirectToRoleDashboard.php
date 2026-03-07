@@ -28,8 +28,10 @@ class RedirectToRoleDashboard
             return $next($request);
         }
 
+        $user = $request->user();
+
         foreach ($this->roleDashboards as $role => $routeName) {
-            if ($request->user()->hasRole($role)) {
+            if ($user->role === $role || $user->hasRole($role)) {
                 return redirect()->route($routeName);
             }
         }
