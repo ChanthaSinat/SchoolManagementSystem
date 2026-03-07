@@ -1,0 +1,77 @@
+<?php
+
+namespace App\Http\Controllers\Student;
+
+use App\Http\Controllers\Controller;
+use App\Models\Attendance;
+use App\Models\Enrollment;
+use App\Models\Grade;
+use App\Models\Timetable;
+use Illuminate\View\View;
+
+class StudentDashboardController extends Controller
+{
+    public function index(): View
+    {
+        $student = auth()->user();
+        $enrollment = Enrollment::where('student_id', $student->id)
+            ->where('status', 'active')
+            ->with(['schoolClass', 'section'])
+            ->firstOrFail();
+
+        // Attendance
+        $totalDays = Attendance::where('student_id', $student->id)->count();
+        $presentDays = Attendance::where('student_id', $student->id)
+            ->where('status', 'present')
+            ->count();
+        $attendanceRate = $totalDays > 0 ? round(($presentDays / $totalDays) * 100) : 0;
+
+        // Grades
+        $grades = Grade::where('student_id', $student->id)->get();
+        $gradesWithScore = $grades->filter(fn ($g) => $g->score !== null && $g->max_score > 0);
+        $overallAvg = $gradesWithScore->count() > 0
+            ? round($gradesWithScore->avg(fn ($g) => ((float) $g->score / (float) $g->max_score) * 100), 1)
+            : 0;
+        $overallLetter = $overallAvg >= 90 ? 'A' : ($overallAvg >= 80 ? 'B' : ($overallAvg >= 70 ? 'C' : ($overallAvg >= 60 ? 'D' : 'F')));
+
+        // Today's schedule
+        $todaySchedule = Timetable::where('school_class_id', $enrollment->school_class_id)
+            ->where('section_id', $enrollment->section_id)
+            ->where('day_of_week', strtolower(now()->format('l')))
+            ->with(['subject', 'user'])
+            ->orderBy('start_time')
+            ->get();
+
+        // Recent grades
+        $recentGrades = Grade::where('student_id', $student->id)
+            ->with('subject')
+            ->latest()
+            ->take(5)
+            ->get();
+
+        // Attendance this month
+        $monthStart = now()->startOfMonth();
+        $monthEnd = now()->endOfMonth();
+        $attendanceThisMonth = Attendance::where('student_id', $student->id)
+            ->whereBetween('date', [$monthStart, $monthEnd])
+            ->get();
+        $monthPresent = $attendanceThisMonth->where('status', 'present')->count();
+        $monthAbsent = $attendanceThisMonth->where('status', 'absent')->count();
+        $recentAttendance = Attendance::where('student_id', $student->id)
+            ->orderByDesc('date')
+            ->take(5)
+            ->get();
+
+        return view('student.dashboard', [
+            'enrollment' => $enrollment,
+            'overallAvg' => $overallAvg,
+            'overallLetter' => $overallLetter,
+            'attendanceRate' => $attendanceRate,
+            'todaySchedule' => $todaySchedule,
+            'recentGrades' => $recentGrades,
+            'monthPresent' => $monthPresent,
+            'monthAbsent' => $monthAbsent,
+            'recentAttendance' => $recentAttendance,
+        ]);
+    }
+}
