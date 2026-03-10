@@ -60,10 +60,14 @@ Artisan::command('schedule:random-teacher {teacherId}', function (int $teacherId
         }
 
         // Create lessons per section so enrolled students always see a schedule.
-        // Each section gets 2–4 random lessons across the week.
+        // Each section gets 1–2 random lessons across the week,
+        // and we never schedule more than 2 lessons for a section on the same day.
         $usedSlots = [];
         foreach ($sections as $section) {
-            $lessonCount = rand(2, 4);
+            $lessonCount = rand(1, 2);
+
+            // Track how many lessons this section already has per day
+            $perDayCounts = [];
 
             $attempts = 0;
             $createdForSection = 0;
@@ -71,6 +75,12 @@ Artisan::command('schedule:random-teacher {teacherId}', function (int $teacherId
                 $attempts++;
                 $day = $days[array_rand($days)];
                 $slotIndex = array_rand($timeSlots);
+
+                // Enforce at most 2 lessons per day for this section
+                $currentDayCount = $perDayCounts[$day] ?? 0;
+                if ($currentDayCount >= 2) {
+                    continue;
+                }
 
                 // Avoid exact duplicates for (section, day, slot) within this class
                 $key = $section->id.'#'.$day.'#'.$slotIndex;
@@ -95,6 +105,7 @@ Artisan::command('schedule:random-teacher {teacherId}', function (int $teacherId
 
                 $createdCount++;
                 $createdForSection++;
+                $perDayCounts[$day] = ($perDayCounts[$day] ?? 0) + 1;
             }
         }
     }
