@@ -12,56 +12,56 @@ class QuestionSeeder extends Seeder
      */
     public function run(): void
     {
-        $subjects = \App\Models\Subject::whereIn('name', ['Mathematics', 'Physics I'])->get();
+        $subject = \App\Models\Subject::where('name', 'Web Programming')->first();
 
-        foreach ($subjects as $subject) {
-            if ($subject->name === 'Mathematics') {
-                $questions = [
-                    [
-                        'question_text' => 'What is 5 + 7?',
-                        'options' => ['10', '11', '12', '13'],
-                        'correct_option_index' => 2,
-                        'difficulty' => 'easy',
-                    ],
-                    [
-                        'question_text' => 'What is the square root of 64?',
-                        'options' => ['6', '7', '8', '9'],
-                        'correct_option_index' => 2,
-                        'difficulty' => 'easy',
-                    ],
-                    [
-                        'question_text' => 'Solve for x: 2x = 10.',
-                        'options' => ['2', '3', '5', '10'],
-                        'correct_option_index' => 2,
-                        'difficulty' => 'easy',
-                    ],
-                ];
-            } else {
-                $questions = [
-                    [
-                        'question_text' => 'What is the unit of force?',
-                        'options' => ['Newton', 'Joule', 'Watt', 'Volt'],
-                        'correct_option_index' => 0,
-                        'difficulty' => 'easy',
-                    ],
-                    [
-                        'question_text' => 'What planet is known as the Red Planet?',
-                        'options' => ['Earth', 'Mars', 'Jupiter', 'Venus'],
-                        'correct_option_index' => 1,
-                        'difficulty' => 'easy',
-                    ],
-                    [
-                        'question_text' => 'Light year is a unit of?',
-                        'options' => ['Time', 'Distance', 'Speed', 'Mass'],
-                        'correct_option_index' => 1,
-                        'difficulty' => 'easy',
-                    ],
-                ];
-            }
+        if (! $subject) {
+            return;
+        }
 
-            foreach ($questions as $q) {
-                \App\Models\Question::create(array_merge($q, ['subject_id' => $subject->id]));
-            }
+        $questions = [
+            [
+                'question_text' => 'In Laravel, which command creates a new controller named UserController?',
+                'options' => [
+                    'php artisan make:controller UserController',
+                    'php artisan new:controller UserController',
+                    'php artisan create:controller UserController',
+                    'php artisan controller:make UserController',
+                ],
+                'correct_option_index' => 0,
+                'difficulty' => 'easy',
+            ],
+            [
+                'question_text' => 'In a Blade view, how do you safely echo a variable called $name?',
+                'options' => [
+                    '{{ name }}',
+                    '@name',
+                    '{{ $name }}',
+                    '<?= $name ?>',
+                ],
+                'correct_option_index' => 2,
+                'difficulty' => 'easy',
+            ],
+            [
+                'question_text' => 'Which HTTP verb is typically used in a form to submit NEW data to a Laravel route?',
+                'options' => [
+                    'GET',
+                    'POST',
+                    'PUT',
+                    'DELETE',
+                ],
+                'correct_option_index' => 1,
+                'difficulty' => 'easy',
+            ],
+        ];
+
+        foreach ($questions as $q) {
+            \App\Models\Question::firstOrCreate(
+                [
+                    'subject_id' => $subject->id,
+                    'question_text' => $q['question_text'],
+                ],
+                $q + ['subject_id' => $subject->id]
+            );
         }
     }
 }

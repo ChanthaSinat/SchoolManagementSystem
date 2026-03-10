@@ -106,23 +106,40 @@
                     @if ($roleLabel === 'Student')
                         <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                             <div class="space-y-2">
+                                <x-input-label for="year_level_student" :value="__('Year Level')" class="text-xs font-black uppercase tracking-wider text-slate-500 ml-1" />
+                                <select id="year_level_student" class="w-full px-4 py-3 bg-white/50 border-slate-200 rounded-xl focus:ring-4 focus:ring-indigo-500/10 focus:border-indigo-400 transition-all text-sm outline-none">
+                                    <option value="">{{ __('— Select Year —') }}</option>
+                                    <option value="foundation">Foundation</option>
+                                    <option value="sophomore">Sophomore</option>
+                                    <option value="junior">Junior</option>
+                                    <option value="senior">Senior</option>
+                                </select>
+                            </div>
+                            <div class="space-y-2">
+                                <x-input-label for="semester_student" :value="__('Semester')" class="text-xs font-black uppercase tracking-wider text-slate-500 ml-1" />
+                                <select id="semester_student" class="w-full px-4 py-3 bg-white/50 border-slate-200 rounded-xl focus:ring-4 focus:ring-indigo-500/10 focus:border-indigo-400 transition-all text-sm outline-none">
+                                    <option value="">{{ __('— Select Semester —') }}</option>
+                                    <option value="1">Semester 1</option>
+                                    <option value="2">Semester 2</option>
+                                </select>
+                            </div>
+                            <div class="space-y-2 md:col-span-2">
                                 <x-input-label for="school_class_id" :value="__('Select Class')" class="text-xs font-black uppercase tracking-wider text-slate-500 ml-1" />
                                 <select id="school_class_id" name="school_class_id" class="w-full px-4 py-3 bg-white/50 border-slate-200 rounded-xl focus:ring-4 focus:ring-indigo-500/10 focus:border-indigo-400 transition-all text-sm outline-none">
                                     <option value="">{{ __('— None —') }}</option>
                                     @foreach ($schoolClasses as $class)
-                                        <option value="{{ $class->id }}" data-sections="{{ $class->sections->map(fn($s) => ['id' => $s->id, 'name' => $s->name])->values()->toJson() }}"
+                                        <option value="{{ $class->id }}"
+                                            data-year="{{ $class->year_level ?? 'foundation' }}"
+                                            data-semester="{{ $class->semester ?? 1 }}"
+                                            data-sections="{{ $class->sections->map(fn($s) => ['id' => $s->id, 'name' => $s->name])->values()->toJson() }}"
                                             {{ old('school_class_id', $enrollment?->school_class_id ?? '') == $class->id ? 'selected' : '' }}>
                                             {{ $class->name }}
                                         </option>
                                     @endforeach
                                 </select>
                             </div>
-                            <div class="space-y-2">
-                                <x-input-label for="section_id" :value="__('Select Section')" class="text-xs font-black uppercase tracking-wider text-slate-500 ml-1" />
-                                <select id="section_id" name="section_id" class="w-full px-4 py-3 bg-white/50 border-slate-200 rounded-xl focus:ring-4 focus:ring-indigo-500/10 focus:border-indigo-400 transition-all text-sm outline-none" data-selected="{{ old('section_id', $enrollment?->section_id ?? '') }}">
-                                    <option value="">{{ __('— Select Class First —') }}</option>
-                                </select>
-                            </div>
+                            <!-- Section is now auto-assigned based on class; no manual A/B selection -->
+                            <input type="hidden" id="section_id" name="section_id" value="{{ old('section_id', $enrollment?->section_id ?? '') }}">
                             <div class="space-y-2">
                                 <x-input-label for="roll_number" :value="__('Roll Number')" class="text-xs font-black uppercase tracking-wider text-slate-500 ml-1" />
                                 <x-text-input id="roll_number" name="roll_number" type="number" class="w-full px-4 py-3 bg-white/50 border-slate-200 rounded-xl focus:ring-4 focus:ring-indigo-500/10 focus:border-indigo-400 transition-all" :value="old('roll_number', $enrollment?->roll_number ?? '')" />
@@ -135,12 +152,41 @@
                     @else
                         <div class="space-y-4">
                             <p class="text-xs font-bold text-slate-500 uppercase tracking-widest ml-1 mb-2">Assigned Classes</p>
-                            <div class="grid grid-cols-2 md:grid-cols-3 gap-4 p-4 bg-slate-50/50 rounded-2xl border border-slate-100 max-h-48 overflow-y-auto custom-scrollbar">
+                            <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                                <div class="space-y-2 md:col-span-1">
+                                    <x-input-label for="year_level_teacher" :value="__('Year Level')" class="text-xs font-black uppercase tracking-wider text-slate-500 ml-1" />
+                                    <select id="year_level_teacher" class="w-full px-4 py-3 bg-white/50 border-slate-200 rounded-xl focus:ring-4 focus:ring-indigo-500/10 focus:border-indigo-400 transition-all text-sm outline-none">
+                                        <option value="">{{ __('— All Years —') }}</option>
+                                        <option value="foundation">Foundation</option>
+                                        <option value="sophomore">Sophomore</option>
+                                        <option value="junior">Junior</option>
+                                        <option value="senior">Senior</option>
+                                    </select>
+                                </div>
+                                <div class="space-y-2 md:col-span-1">
+                                    <x-input-label for="semester_teacher" :value="__('Semester')" class="text-xs font-black uppercase tracking-wider text-slate-500 ml-1" />
+                                    <select id="semester_teacher" class="w-full px-4 py-3 bg-white/50 border-slate-200 rounded-xl focus:ring-4 focus:ring-indigo-500/10 focus:border-indigo-400 transition-all text-sm outline-none">
+                                        <option value="">{{ __('— All Semesters —') }}</option>
+                                        <option value="1">Semester 1</option>
+                                        <option value="2">Semester 2</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="grid grid-cols-2 md:grid-cols-3 gap-4 p-4 bg-slate-50/50 rounded-2xl border border-slate-100 max-h-56 overflow-y-auto custom-scrollbar" id="teacher-class-list">
                                 @foreach ($schoolClasses as $class)
-                                    <label class="group flex items-center gap-3 p-3 bg-white border border-slate-200 rounded-xl cursor-pointer hover:border-indigo-400 hover:bg-indigo-50/50 transition-all shadow-sm">
+                                    <label class="group flex items-center gap-3 p-3 bg-white border border-slate-200 rounded-xl cursor-pointer hover:border-indigo-400 hover:bg-indigo-50/50 transition-all shadow-sm"
+                                           data-year="{{ $class->year_level ?? 'foundation' }}"
+                                           data-semester="{{ $class->semester ?? 1 }}">
                                         <input type="checkbox" name="class_ids[]" value="{{ $class->id }}" class="w-4 h-4 rounded border-slate-300 text-indigo-600 focus:ring-indigo-500/20"
                                             {{ in_array($class->id, $teacherClassIds ?? []) ? 'checked' : '' }} />
-                                        <span class="text-sm font-bold text-slate-700 group-hover:text-indigo-700 transition-colors">{{ $class->name }}</span>
+                                        <span class="text-sm font-bold text-slate-700 group-hover:text-indigo-700 transition-colors">
+                                            {{ $class->name }}
+                                            @if($class->year_level || $class->semester)
+                                                <span class="block text-[10px] font-semibold text-slate-400 mt-0.5">
+                                                    {{ ucfirst($class->year_level ?? 'foundation') }} • {{ $class->semester ? 'Sem '.$class->semester : 'Sem 1' }}
+                                                </span>
+                                            @endif
+                                        </span>
                                     </label>
                                 @endforeach
                             </div>
@@ -192,35 +238,114 @@
     </div>
 </div>
 
-@if ($roleLabel === 'Student' && isset($schoolClasses))
+@if (isset($schoolClasses))
 <script>
     document.addEventListener('DOMContentLoaded', function() {
+        // Shared elements
         var classSelect = document.getElementById('school_class_id');
         var sectionSelect = document.getElementById('section_id');
-        if (!classSelect || !sectionSelect) return;
+
+        // Student: filter single class select by year & semester using data attributes
+        var yearStudent = document.getElementById('year_level_student');
+        var semStudent = document.getElementById('semester_student');
+        var classOptions = classSelect ? Array.from(classSelect.options) : [];
+
+        function applyStudentFilters() {
+            if (!classSelect) return;
+
+            var year = yearStudent ? yearStudent.value : '';
+            var sem = semStudent ? semStudent.value : '';
+
+            classOptions.forEach(function(opt) {
+                // Always show the placeholder option
+                if (!opt.value) {
+                    opt.hidden = false;
+                    return;
+                }
+
+                var cYear = opt.getAttribute('data-year') || '';
+                var cSem = opt.getAttribute('data-semester') || '';
+
+                var show = true;
+                if (year && cYear !== year) show = false;
+                if (sem && String(cSem) !== String(sem)) show = false;
+
+                opt.hidden = !show;
+            });
+
+            // If current selection is hidden by filters, reset to none
+            var selected = classSelect.options[classSelect.selectedIndex];
+            if (!selected || selected.hidden) {
+                classSelect.value = '';
+            }
+
+            updateSections();
+        }
 
         function updateSections() {
+            if (!classSelect || !sectionSelect) return;
             var opt = classSelect.options[classSelect.selectedIndex];
-            var sections = opt.getAttribute('data-sections') ? JSON.parse(opt.getAttribute('data-sections')) : [];
-            
-            sectionSelect.innerHTML = '<option value="">{{ __("— Select Section —") }}</option>';
-            
-            sections.forEach(function(s) {
-                var o = document.createElement('option');
-                o.value = s.id;
-                o.textContent = s.name;
-                sectionSelect.appendChild(o);
-            });
-            
-            var selected = sectionSelect.getAttribute('data-selected');
-            if (selected) {
-                sectionSelect.value = selected;
-                sectionSelect.removeAttribute('data-selected');
+            var sections = opt && opt.dataset.sections
+                ? JSON.parse(opt.dataset.sections)
+                : [];
+
+            if (sections.length > 0) {
+                sectionSelect.value = sections[0].id;
+            } else {
+                sectionSelect.value = '';
             }
         }
 
-        classSelect.addEventListener('change', updateSections);
-        updateSections();
+        if (yearStudent && semStudent) {
+            yearStudent.addEventListener('change', applyStudentFilters);
+            semStudent.addEventListener('change', applyStudentFilters);
+        }
+        if (classSelect) {
+            classSelect.addEventListener('change', updateSections);
+        }
+
+        // Teacher: filter checkbox grid
+        var yearTeacher = document.getElementById('year_level_teacher');
+        var semTeacher = document.getElementById('semester_teacher');
+        var classCards = document.querySelectorAll('#teacher-class-list label[data-year][data-semester]');
+
+        function filterTeacherClasses() {
+            if (!yearTeacher || !semTeacher) return;
+            var year = yearTeacher.value;
+            var sem = semTeacher.value;
+
+            classCards.forEach(function(card) {
+                var cYear = card.getAttribute('data-year');
+                var cSem = card.getAttribute('data-semester');
+
+                var show = true;
+                if (year && cYear !== year) show = false;
+                if (sem && String(cSem) !== String(sem)) show = false;
+
+                card.style.display = show ? '' : 'none';
+            });
+        }
+
+        if (yearTeacher && semTeacher) {
+            yearTeacher.addEventListener('change', filterTeacherClasses);
+            semTeacher.addEventListener('change', filterTeacherClasses);
+        }
+
+        // Initial setup
+        filterTeacherClasses();
+
+        // Pre-fill student year/semester from currently selected class, if any
+        if (classSelect && yearStudent && semStudent) {
+            var currentOpt = classSelect.options[classSelect.selectedIndex];
+            if (currentOpt) {
+                var currentYear = currentOpt.getAttribute('data-year');
+                var currentSem = currentOpt.getAttribute('data-semester');
+                if (currentYear) yearStudent.value = currentYear;
+                if (currentSem) semStudent.value = String(currentSem);
+            }
+        }
+
+        applyStudentFilters();
     });
 </script>
 @endif

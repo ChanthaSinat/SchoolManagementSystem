@@ -55,14 +55,12 @@
                                 $status = $existingRecord ? $existingRecord->status : 'present';
                                 $note = $existingRecord ? ($existingRecord->note ?? '') : '';
 
-                                // Compute display name and initials with safe fallbacks
-                                $displayName = $user
-                                    ? (trim(($user->first_name ?? '') . ' ' . ($user->last_name ?? '')) ?: ($user->full_name ?? $user->name ?? 'Student'))
-                                    : 'Student';
+                                // Compute display name with robust fallback for empty strings
+                                $fullName = $user ? trim($user->full_name) : '';
+                                $displayName = $fullName ?: ($user->name ?? 'Student');
 
-                                $nameForInitials = $user ? ($user->full_name ?? $user->name ?? $displayName) : $displayName;
-                                $nameForInitials = trim($nameForInitials);
-                                $parts = preg_split('/\s+/', $nameForInitials);
+                                $nameForInitials = $displayName;
+                                $parts = preg_split('/\s+/', trim($nameForInitials));
                                 $firstInitial = isset($parts[0][0]) ? mb_substr($parts[0], 0, 1) : 'S';
                                 $secondInitial = isset($parts[1][0]) ? mb_substr($parts[1], 0, 1) : '';
                                 $initials = mb_strtoupper($firstInitial . $secondInitial);

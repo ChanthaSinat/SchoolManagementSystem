@@ -42,16 +42,8 @@
 
     <!-- Main Table Container -->
     <div class="bg-white/60 backdrop-blur-xl rounded-3xl border border-white shadow-sm overflow-hidden">
-        <div class="p-6 border-b border-slate-100 bg-white/50 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-            <div class="relative w-full max-w-xs">
-                <svg xmlns="http://www.w3.org/2000/svg" class="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>
-                <input type="text" placeholder="Filter by name..." class="w-full pl-10 pr-4 py-2 bg-slate-100/50 border border-slate-200 rounded-xl text-xs focus:ring-4 focus:ring-indigo-500/10 focus:bg-white focus:border-indigo-400 outline-none transition-all">
-            </div>
-            <div class="flex items-center gap-2">
-                <button class="px-4 py-2 text-xs font-bold text-slate-600 bg-white border border-slate-200 rounded-xl hover:bg-slate-50 transition-all">Export PDF</button>
-                <button class="px-4 py-2 text-xs font-bold text-white bg-indigo-600 rounded-xl hover:bg-indigo-700 transition-all shadow-md shadow-indigo-100">Send Notice</button>
-            </div>
-        </div>
+        <!-- Header strip simplified: no name filter -->
+        <div class="p-4 border-b border-slate-100 bg-white/50"></div>
 
         <div class="overflow-x-auto">
             <table class="w-full text-left border-collapse">
@@ -89,7 +81,7 @@
                                 </div>
                             </td>
                             <td class="px-8 py-5 text-right">
-                                <div class="flex items-center justify-end gap-2 transform group-hover:translate-x-0 sm:translate-x-4 opacity-100 sm:opacity-0 group-hover:opacity-100 transition-all duration-300">
+                                <div class="flex items-center justify-end gap-2 transition-all duration-300">
                                     <form action="{{ route('admin.teachers.generate-schedule', $teacher) }}" method="POST" class="inline">
                                         @csrf
                                         <button type="submit" class="p-2.5 bg-white text-emerald-600 border border-slate-200 rounded-xl hover:bg-emerald-600 hover:text-white hover:border-emerald-600 shadow-sm transition-all" title="Generate random timetable">

@@ -33,7 +33,7 @@
                 </div>
                 @endif
 
-                {{-- Teacher nav: Dashboard | Attendance | Grades --}}
+                {{-- Teacher nav: Dashboard | Attendance | Exams --}}
                 @if(auth()->user()->role === 'teacher' || auth()->user()->hasRole('teacher'))
                 <div class="hidden space-x-8 sm:-my-px sm:ms-10 sm:flex">
                     <x-nav-link :href="route('teacher.dashboard')" :active="request()->routeIs('teacher.dashboard')">
@@ -42,13 +42,13 @@
                     <x-nav-link :href="route('teacher.attendance.index')" :active="request()->routeIs('teacher.attendance.*')">
                         {{ __('Attendance') }}
                     </x-nav-link>
-                    <x-nav-link :href="route('teacher.grades.index')" :active="request()->routeIs('teacher.grades.*')">
-                        {{ __('Grades') }}
+                    <x-nav-link :href="route('teacher.exams.results')" :active="request()->routeIs('teacher.exams.results')">
+                        {{ __('Exam Results') }}
                     </x-nav-link>
                 </div>
                 @endif
 
-                {{-- Student sidebar: Dashboard | My Schedule | My Grades | My Attendance | Settings --}}
+                {{-- Student sidebar: Dashboard | My Schedule | My Attendance | Exams | Settings --}}
                 @if(auth()->user()->role === 'student' || auth()->user()->hasRole('student'))
                 <div class="hidden space-x-8 sm:-my-px sm:ms-10 sm:flex">
                     <x-nav-link :href="route('student.dashboard')" :active="request()->routeIs('student.dashboard')">
@@ -57,11 +57,11 @@
                     <x-nav-link :href="route('student.timetable')" :active="request()->routeIs('student.timetable')">
                         {{ __('My Schedule') }}
                     </x-nav-link>
-                    <x-nav-link :href="route('student.grades')" :active="request()->routeIs('student.grades')">
-                        {{ __('My Grades') }}
-                    </x-nav-link>
                     <x-nav-link :href="route('student.attendance')" :active="request()->routeIs('student.attendance')">
                         {{ __('My Attendance') }}
+                    </x-nav-link>
+                    <x-nav-link :href="route('student.exams.index')" :active="request()->routeIs('student.exams.*')">
+                        {{ __('Final Exams') }}
                     </x-nav-link>
                 </div>
                 @endif
@@ -116,13 +116,13 @@
             @if(auth()->user()->role === 'teacher' || auth()->user()->hasRole('teacher'))
             <x-responsive-nav-link :href="route('teacher.dashboard')" :active="request()->routeIs('teacher.dashboard')">{{ __('Dashboard') }}</x-responsive-nav-link>
             <x-responsive-nav-link :href="route('teacher.attendance.index')" :active="request()->routeIs('teacher.attendance.*')">{{ __('Attendance') }}</x-responsive-nav-link>
-            <x-responsive-nav-link :href="route('teacher.grades.index')" :active="request()->routeIs('teacher.grades.*')">{{ __('Grades') }}</x-responsive-nav-link>
+            <x-responsive-nav-link :href="route('teacher.exams.results')" :active="request()->routeIs('teacher.exams.results')">{{ __('Exam Results') }}</x-responsive-nav-link>
             @endif
             @if(auth()->user()->role === 'student' || auth()->user()->hasRole('student'))
             <x-responsive-nav-link :href="route('student.dashboard')" :active="request()->routeIs('student.dashboard')">{{ __('Dashboard') }}</x-responsive-nav-link>
             <x-responsive-nav-link :href="route('student.timetable')" :active="request()->routeIs('student.timetable')">{{ __('My Schedule') }}</x-responsive-nav-link>
-            <x-responsive-nav-link :href="route('student.grades')" :active="request()->routeIs('student.grades')">{{ __('My Grades') }}</x-responsive-nav-link>
             <x-responsive-nav-link :href="route('student.attendance')" :active="request()->routeIs('student.attendance')">{{ __('My Attendance') }}</x-responsive-nav-link>
+            <x-responsive-nav-link :href="route('student.exams.index')" :active="request()->routeIs('student.exams.*')">{{ __('Final Exams') }}</x-responsive-nav-link>
             @endif
         </div>
         <div class="pt-4 pb-1 border-t border-gray-200">

@@ -23,7 +23,8 @@
                 @forelse ($students as $row)
                     <tr class="hover:bg-slate-50/80 transition-colors">
                         <td class="px-6 py-4">
-                            <span class="font-semibold text-slate-800">{{ $row->user->full_name ?? $row->user->name ?? __('—') }}</span>
+                            @php $fullName = trim($row->user->full_name); @endphp
+                            <span class="font-semibold text-slate-800">{{ $fullName ?: ($row->user->name ?? __('—')) }}</span>
                         </td>
                         <td class="px-6 py-4 text-sm text-slate-600">{{ $row->roll_number ?? '—' }}</td>
                         <td class="px-6 py-4 text-sm text-slate-600">{{ $row->class_names ?: '—' }}</td>

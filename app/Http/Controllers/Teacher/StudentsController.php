@@ -20,7 +20,16 @@ class StudentsController extends Controller
             ->orderBy('school_class_id')
             ->orderBy('section_id')
             ->orderBy('roll_number')
-            ->get();
+            ->get()
+            // Exclude any admin users from the teacher's student list
+            ->filter(function ($enrollment) {
+                $user = $enrollment->user;
+                if (! $user) {
+                    return false;
+                }
+
+                return $user->role !== 'admin' && ! $user->hasRole('admin');
+            });
 
         // One row per distinct student (with their primary class/section for display)
         $students = $enrollments->unique('student_id')->map(function ($e) use ($enrollments) {

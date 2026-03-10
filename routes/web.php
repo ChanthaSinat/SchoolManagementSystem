@@ -1,15 +1,14 @@
 <?php
 
 use App\Http\Controllers\Admin\AdminDashboardController;
+use App\Http\Controllers\Admin\ScheduleController as AdminScheduleController;
 use App\Http\Controllers\Admin\UserController as AdminUserController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\Student\StudentAttendanceController;
 use App\Http\Controllers\Student\StudentDashboardController;
-use App\Http\Controllers\Student\StudentGradeController;
 use App\Http\Controllers\Student\StudentTimetableController;
 use App\Http\Controllers\Teacher\AttendanceController;
 use App\Http\Controllers\Teacher\CurriculumController;
-use App\Http\Controllers\Teacher\GradeController;
 use App\Http\Controllers\Teacher\ScheduleController;
 use App\Http\Controllers\Teacher\StudentsController;
 use App\Http\Controllers\Teacher\TeacherDashboardController;
@@ -26,6 +25,7 @@ Route::get('/dashboard', function () {
 
 Route::middleware(['auth', 'verified', 'role:admin'])->prefix('admin')->name('admin.')->group(function () {
     Route::get('/dashboard', [AdminDashboardController::class, 'index'])->name('dashboard');
+    Route::get('/schedule', [AdminScheduleController::class, 'index'])->name('schedule.index');
     Route::get('/teachers', [AdminUserController::class, 'teachers'])->name('teachers.index');
     Route::get('/students', [AdminUserController::class, 'students'])->name('students.index');
     Route::get('/teachers/create', [AdminUserController::class, 'createTeacher'])->name('teachers.create');
@@ -47,10 +47,6 @@ Route::middleware(['auth', 'verified', 'role.teacher'])->prefix('teacher')->name
     Route::get('/attendance/mark', [AttendanceController::class, 'showMarkForm'])->name('attendance.mark');
     Route::post('/attendance/store', [AttendanceController::class, 'store'])->name('attendance.store');
     Route::get('/attendance/history', [AttendanceController::class, 'history'])->name('attendance.history');
-    Route::get('/grades', [GradeController::class, 'index'])->name('grades.index');
-    Route::get('/grades/{classId}/{subjectId}', [GradeController::class, 'show'])->name('grades.show');
-    Route::post('/grades/{classId}/{subjectId}', [GradeController::class, 'store'])->name('grades.store');
-    Route::get('/grades/{classId}/{subjectId}/pdf', [GradeController::class, 'exportPdf'])->name('grades.pdf');
     Route::get('/students', [StudentsController::class, 'index'])->name('students.index');
     Route::get('/curriculum', [CurriculumController::class, 'index'])->name('curriculum.index');
     Route::get('/schedule', [ScheduleController::class, 'index'])->name('schedule.index');
@@ -62,7 +58,6 @@ Route::middleware(['auth', 'verified', 'role.teacher'])->prefix('teacher')->name
 Route::middleware(['auth', 'verified', 'role.student'])->prefix('student')->name('student.')->group(function () {
     Route::get('/dashboard', [StudentDashboardController::class, 'index'])->name('dashboard');
     Route::get('/timetable', [StudentTimetableController::class, 'index'])->name('timetable');
-    Route::get('/grades', [StudentGradeController::class, 'index'])->name('grades');
     Route::get('/attendance', [StudentAttendanceController::class, 'index'])->name('attendance');
 
     // Final Exam Routes

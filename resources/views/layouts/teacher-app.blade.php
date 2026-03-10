@@ -44,9 +44,12 @@
                     <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5 mr-3 opacity-80" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="18" height="18" x="3" y="4" rx="2" ry="2"/><line x1="16" x2="16" y1="2" y2="6"/><line x1="8" x2="8" y1="2" y2="6"/><line x1="3" x2="21" y1="10" y2="10"/></svg>
                     Schedule
                 </a>
-                <a href="{{ route('teacher.grades.index') }}" class="flex items-center w-full px-4 py-3.5 rounded-xl {{ request()->routeIs('teacher.grades.*') ? 'bg-indigo-500 text-white shadow-lg shadow-indigo-500/30' : 'text-slate-300 hover:bg-slate-700/80 hover:text-white' }} font-semibold text-sm transition-colors">
-                    <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5 mr-3 opacity-80" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m12 14 4-4"/><path d="M3.34 19a10 10 0 1 1 17.32 0"/></svg>
-                    Grading
+                <a href="{{ route('teacher.attendance.index') }}" class="flex items-center w-full px-4 py-3.5 rounded-xl {{ request()->routeIs('teacher.attendance.*') ? 'bg-indigo-500 text-white shadow-lg shadow-indigo-500/30' : 'text-slate-300 hover:bg-slate-700/80 hover:text-white' }} font-semibold text-sm transition-colors">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5 mr-3 opacity-80" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <rect x="3" y="3" width="18" height="18" rx="2" ry="2"/>
+                        <path d="M9 12l2 2 4-4"/>
+                    </svg>
+                    Mark Attendance
                 </a>
                 <a href="{{ route('teacher.exams.results') }}" class="flex items-center w-full px-4 py-3.5 rounded-xl {{ request()->routeIs('teacher.exams.results') ? 'bg-indigo-500 text-white shadow-lg shadow-indigo-500/30' : 'text-slate-300 hover:bg-slate-700/80 hover:text-white' }} font-semibold text-sm transition-colors">
                     <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5 mr-3 opacity-80" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
@@ -78,27 +81,11 @@
 
         <!-- Main Content Area -->
         <main class="flex-1 flex flex-col overflow-hidden bg-slate-100">
-            <!-- Header -->
-            <header class="h-20 bg-white/90 backdrop-blur-sm border-b border-slate-200/80 flex items-center justify-between px-6 md:px-8 shrink-0 z-10 shadow-sm">
-                <div class="relative w-full max-w-md">
-                    <svg xmlns="http://www.w3.org/2000/svg" class="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>
-                    <input type="text" placeholder="Search students, lessons, reports..." class="w-full pl-11 pr-4 py-3 bg-slate-100 border border-slate-200 rounded-xl text-sm focus:ring-2 focus:ring-indigo-500 focus:bg-white focus:border-indigo-200 outline-none transition-all">
-                </div>
-
-                <div class="flex items-center gap-3">
-                    <button type="button" class="p-3 text-slate-500 bg-slate-100 hover:bg-slate-200 rounded-xl relative transition-colors">
-                        <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
-                        <span class="absolute top-2 right-2 w-2 h-2 bg-indigo-500 rounded-full border-2 border-white"></span>
-                    </button>
-                    <button type="button" class="p-3 text-slate-500 bg-slate-100 hover:bg-slate-200 rounded-xl relative transition-colors">
-                        <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 8a6 6 0 0 1 12 0c0 7 3 9 3 9H3s3-2 3-9"/><path d="M10.3 21a1.94 1.94 0 0 0 3.4 0"/></svg>
-                        <span class="absolute top-2 right-2 w-2 h-2 bg-red-500 rounded-full border-2 border-white"></span>
-                    </button>
-                    <div class="w-px h-7 bg-slate-200"></div>
-                    <a href="{{ route('teacher.grades.index') }}" class="flex items-center px-5 py-3 bg-indigo-600 text-white rounded-xl text-sm font-bold hover:bg-indigo-700 shadow-lg shadow-indigo-200 transition-all active:scale-[0.98]">
-                        <span class="mr-2">+</span> New Lesson
-                    </a>
-                </div>
+            <!-- Header (simplified for teachers) -->
+            <header class="h-16 bg-white/90 backdrop-blur-sm border-b border-slate-200/80 flex items-center px-6 md:px-8 shrink-0 z-10 shadow-sm">
+                <h1 class="text-sm md:text-base font-bold text-slate-700">
+                    Teacher Workspace
+                </h1>
             </header>
 
             <!-- Dashboard Content -->

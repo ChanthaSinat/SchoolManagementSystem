@@ -19,10 +19,6 @@
         </h1>
         <p class="text-slate-500 mt-2 font-medium text-sm sm:text-base">Welcome back! You have <span class="text-indigo-600 font-bold border-b border-indigo-200">{{ count($todaySchedule) }}</span> {{ count($todaySchedule) === 1 ? 'class' : 'classes' }} today.</p>
     </div>
-    <div class="hidden sm:flex bg-slate-100/80 backdrop-blur-md p-1.5 rounded-xl shadow-[inset_0_2px_4px_rgba(0,0,0,0.06)] border border-slate-200/50">
-        <button type="button" class="px-5 py-2.5 text-sm font-bold bg-white text-indigo-900 rounded-lg shadow-[0_2px_10px_rgba(0,0,0,0.08)] transition-all transform hover:scale-[1.02]">Today</button>
-        <button type="button" class="px-5 py-2.5 text-sm font-bold text-slate-500 hover:text-slate-800 transition-colors">This Week</button>
-    </div>
 </div>
 
 <!-- Stats Grid -->
@@ -119,13 +115,6 @@
                                         Mark Attendance
                                     </a>
                                 @endif
-                                @if (!empty($item->school_class_id) && !empty($item->subject_id))
-                                    <a href="{{ route('teacher.grades.show', [$item->school_class_id, $item->subject_id]) }}"
-                                       class="inline-flex items-center px-3 py-1.5 rounded-lg bg-indigo-50 text-indigo-700 border border-indigo-100 hover:bg-indigo-100 hover:border-indigo-200 transition-colors">
-                                        <svg xmlns="http://www.w3.org/2000/svg" class="w-3.5 h-3.5 mr-1" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 3h18"/><path d="M9 7h10"/><path d="M3 7h2"/><path d="M9 11h10"/><path d="M3 11h2"/><path d="M9 15h10"/><path d="M3 15h2"/><path d="M9 19h10"/><path d="M3 19h2"/></svg>
-                                        Open Gradebook
-                                    </a>
-                                @endif
                             </div>
                         </div>
                     </div>
@@ -166,8 +155,8 @@
                     </div>
                 @endforelse
             </div>
-            <a href="{{ route('teacher.grades.index') }}" class="w-full mt-7 block py-3.5 text-xs font-black text-indigo-600 bg-indigo-50 hover:bg-indigo-100 rounded-xl transition-all uppercase tracking-widest text-center border border-indigo-100 hover:shadow-sm">
-                View History
+            <a href="{{ route('teacher.exams.results') }}" class="w-full mt-7 block py-3.5 text-xs font-black text-indigo-600 bg-indigo-50 hover:bg-indigo-100 rounded-xl transition-all uppercase tracking-widest text-center border border-indigo-100 hover:shadow-sm">
+                View Exam Results
             </a>
         </div>
 

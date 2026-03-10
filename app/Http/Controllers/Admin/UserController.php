@@ -140,8 +140,12 @@ class UserController extends Controller
         if ($user->role === 'teacher' || $user->hasRole('teacher')) {
             $classIds = $request->input('class_ids', []);
             $classIds = is_array($classIds) ? array_filter(array_map('intval', $classIds)) : [];
+
+            // Ensure referenced classes exist
+            $validClassIds = SchoolClass::whereIn('id', $classIds)->pluck('id')->all();
+
             TeacherClass::where('teacher_id', $user->id)->delete();
-            foreach ($classIds as $schoolClassId) {
+            foreach ($validClassIds as $schoolClassId) {
                 TeacherClass::firstOrCreate(
                     ['teacher_id' => $user->id, 'school_class_id' => $schoolClassId],
                     ['teacher_id' => $user->id, 'school_class_id' => $schoolClassId]
@@ -156,6 +160,14 @@ class UserController extends Controller
             Enrollment::where('student_id', $user->id)->update(['status' => 'inactive']);
 
             if ($schoolClassId && $sectionId) {
+                // Ensure the selected class exists before creating/updating enrollment
+                if (! SchoolClass::whereKey($schoolClassId)->exists()) {
+                    return redirect()
+                        ->back()
+                        ->withInput()
+                        ->with('error', __('Selected class is invalid.'));
+                }
+
                 Enrollment::updateOrCreate(
                     [
                         'student_id' => $user->id,

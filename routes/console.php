@@ -59,37 +59,43 @@ Artisan::command('schedule:random-teacher {teacherId}', function (int $teacherId
             continue;
         }
 
-        // Each class gets 2–4 random lessons across the week
-        $lessonCount = rand(2, 4);
+        // Create lessons per section so enrolled students always see a schedule.
+        // Each section gets 2–4 random lessons across the week.
         $usedSlots = [];
+        foreach ($sections as $section) {
+            $lessonCount = rand(2, 4);
 
-        for ($i = 0; $i < $lessonCount; $i++) {
-            $day = $days[array_rand($days)];
-            $slotIndex = array_rand($timeSlots);
+            $attempts = 0;
+            $createdForSection = 0;
+            while ($createdForSection < $lessonCount && $attempts < 50) {
+                $attempts++;
+                $day = $days[array_rand($days)];
+                $slotIndex = array_rand($timeSlots);
 
-            // Avoid exact duplicates for (day, slot) within this class
-            $key = $day.'#'.$slotIndex;
-            if (isset($usedSlots[$key])) {
-                continue;
+                // Avoid exact duplicates for (section, day, slot) within this class
+                $key = $section->id.'#'.$day.'#'.$slotIndex;
+                if (isset($usedSlots[$key])) {
+                    continue;
+                }
+                $usedSlots[$key] = true;
+
+                $slot = $timeSlots[$slotIndex];
+                $subject = $subjects->random();
+
+                Timetable::create([
+                    'school_class_id' => $schoolClass->id,
+                    'section_id' => $section->id,
+                    'subject_id' => $subject->id,
+                    'user_id' => $teacherId,
+                    'day_of_week' => $day,
+                    'start_time' => $slot['start'],
+                    'end_time' => $slot['end'],
+                    'room' => 'B-'.rand(1, 20),
+                ]);
+
+                $createdCount++;
+                $createdForSection++;
             }
-            $usedSlots[$key] = true;
-
-            $slot = $timeSlots[$slotIndex];
-            $section = $sections->random();
-            $subject = $subjects->random();
-
-            Timetable::create([
-                'school_class_id' => $schoolClass->id,
-                'section_id' => $section->id,
-                'subject_id' => $subject->id,
-                'user_id' => $teacherId,
-                'day_of_week' => $day,
-                'start_time' => $slot['start'],
-                'end_time' => $slot['end'],
-                'room' => 'B-'.rand(1, 20),
-            ]);
-
-            $createdCount++;
         }
     }
 

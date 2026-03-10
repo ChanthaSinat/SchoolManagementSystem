@@ -81,9 +81,6 @@
         <button type="submit" class="inline-flex justify-center items-center px-5 py-3 bg-indigo-600 text-white rounded-xl text-sm font-bold hover:bg-indigo-700 shadow-lg shadow-indigo-200 transition-all active:scale-[0.98]">
             {{ __('Save All Scores') }}
         </button>
-        <a href="{{ route('teacher.grades.pdf', [$classId, $subjectId]) }}" class="inline-flex items-center px-5 py-3 border border-slate-200 rounded-xl text-slate-700 bg-white hover:bg-slate-50 font-bold text-sm shadow transition-all" target="_blank">
-            {{ __('Export PDF') }}
-        </a>
         <a href="{{ route('teacher.grades.index') }}" class="inline-flex items-center px-4 py-3 text-slate-600 hover:text-slate-900 font-bold text-sm">{{ __('Back to Grades') }}</a>
     </div>
 </form>

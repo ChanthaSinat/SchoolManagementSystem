@@ -5,7 +5,6 @@ namespace App\Http\Controllers\Student;
 use App\Http\Controllers\Controller;
 use App\Models\Attendance;
 use App\Models\Enrollment;
-use App\Models\Grade;
 use App\Models\Timetable;
 use Illuminate\View\View;
 
@@ -23,11 +22,8 @@ class StudentDashboardController extends Controller
         if (! $enrollment) {
             return view('student.dashboard', [
                 'enrollment' => null,
-                'overallAvg' => 0,
-                'overallLetter' => '—',
                 'attendanceRate' => 0,
                 'todaySchedule' => collect(),
-                'recentGrades' => collect(),
                 'monthPresent' => 0,
                 'monthAbsent' => 0,
                 'recentAttendance' => collect(),
@@ -41,27 +37,12 @@ class StudentDashboardController extends Controller
             ->count();
         $attendanceRate = $totalDays > 0 ? round(($presentDays / $totalDays) * 100) : 0;
 
-        // Grades
-        $grades = Grade::where('student_id', $student->id)->get();
-        $gradesWithScore = $grades->filter(fn ($g) => $g->score !== null && $g->max_score > 0);
-        $overallAvg = $gradesWithScore->count() > 0
-            ? round($gradesWithScore->avg(fn ($g) => ((float) $g->score / (float) $g->max_score) * 100), 1)
-            : 0;
-        $overallLetter = $overallAvg >= 90 ? 'A' : ($overallAvg >= 80 ? 'B' : ($overallAvg >= 70 ? 'C' : ($overallAvg >= 60 ? 'D' : 'F')));
-
         // Today's schedule
         $todaySchedule = Timetable::where('school_class_id', $enrollment->school_class_id)
             ->where('section_id', $enrollment->section_id)
             ->where('day_of_week', strtolower(now()->format('l')))
             ->with(['subject', 'user'])
             ->orderBy('start_time')
-            ->get();
-
-        // Recent grades
-        $recentGrades = Grade::where('student_id', $student->id)
-            ->with('subject')
-            ->latest()
-            ->take(5)
             ->get();
 
         // Attendance this month
@@ -79,11 +60,8 @@ class StudentDashboardController extends Controller
 
         return view('student.dashboard', [
             'enrollment' => $enrollment,
-            'overallAvg' => $overallAvg,
-            'overallLetter' => $overallLetter,
             'attendanceRate' => $attendanceRate,
             'todaySchedule' => $todaySchedule,
-            'recentGrades' => $recentGrades,
             'monthPresent' => $monthPresent,
             'monthAbsent' => $monthAbsent,
             'recentAttendance' => $recentAttendance,

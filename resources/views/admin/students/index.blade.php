@@ -12,9 +12,6 @@
             <p class="text-slate-500 font-medium">Manage student records and academic progress.</p>
         </div>
         <div class="flex items-center gap-3">
-            <button class="bg-white p-2.5 rounded-xl shadow-sm border border-slate-200 text-slate-600 hover:text-blue-600 transition-all hover:shadow-md">
-                <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" x2="12" y1="15" y2="3"/></svg>
-            </button>
             <a href="{{ route('admin.students.create') }}" class="bg-blue-600 text-white px-6 py-3 rounded-xl text-sm font-bold hover:bg-blue-700 shadow-lg shadow-blue-600/20 active:scale-95 transition-all flex items-center gap-2">
                 <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><line x1="12" x2="12" y1="5" y2="19"/><line x1="5" x2="19" y1="12" y2="12"/></svg>
                 Add Student
@@ -34,18 +31,8 @@
 
     <!-- Main Table Container -->
     <div class="bg-white/60 backdrop-blur-xl rounded-3xl border border-white shadow-sm overflow-hidden">
-        <div class="p-6 border-b border-slate-100 bg-white/50 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-            <div class="relative w-full max-w-xs">
-                <svg xmlns="http://www.w3.org/2000/svg" class="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>
-                <input type="text" placeholder="Filter students..." class="w-full pl-10 pr-4 py-2 bg-slate-100/50 border border-slate-200 rounded-xl text-xs focus:ring-4 focus:ring-blue-500/10 focus:bg-white focus:border-blue-400 outline-none transition-all">
-            </div>
-            <div class="flex items-center gap-2">
-                <div class="flex bg-slate-100 rounded-xl p-1 shrink-0">
-                    <button class="px-3 py-1.5 text-[10px] font-black rounded-lg bg-white text-blue-600 shadow-sm transition-all uppercase tracking-wider">All Students</button>
-                    <button class="px-3 py-1.5 text-[10px] font-black rounded-lg text-slate-500 hover:text-slate-700 transition-all uppercase tracking-wider">Active</button>
-                </div>
-            </div>
-        </div>
+        <!-- Header strip simplified: no filters or status buttons -->
+        <div class="p-4 border-b border-slate-100 bg-white/50"></div>
 
         <div class="overflow-x-auto">
             <table class="w-full text-left border-collapse">
@@ -87,7 +74,7 @@
                                 </div>
                             </td>
                             <td class="px-8 py-5 text-right">
-                                <div class="flex items-center justify-end gap-2 opacity-100 sm:opacity-0 group-hover:opacity-100 transition-all duration-300">
+                                <div class="flex items-center justify-end gap-2 transition-all duration-300">
                                     <a href="{{ route('admin.students.edit', $student) }}" class="p-2.5 bg-white text-blue-600 border border-slate-100 rounded-xl hover:bg-blue-600 hover:text-white hover:border-blue-600 shadow-sm transition-all">
                                         <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 3a2.85 2.83 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5Z"/><path d="m15 5 4 4"/></svg>
                                     </a>

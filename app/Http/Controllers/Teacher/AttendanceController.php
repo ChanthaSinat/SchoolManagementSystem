@@ -91,7 +91,23 @@ class AttendanceController extends Controller
             ->where('status', 'active')
             ->with('user')
             ->orderBy('roll_number')
-            ->get();
+            ->get()
+            // Ensure only real students appear (never admins)
+            ->filter(function (Enrollment $enrollment) {
+                $user = $enrollment->user;
+                if (! $user) {
+                    return false;
+                }
+
+                // Exclude any admin
+                if ($user->role === 'admin' || $user->hasRole('admin')) {
+                    return false;
+                }
+
+                // Only include users who are students
+                return $user->role === 'student' || $user->hasRole('student');
+            })
+            ->values();
 
         $existing = Attendance::where('school_class_id', $classId)
             ->where('section_id', $sectionId)

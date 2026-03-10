@@ -13,9 +13,6 @@
                 <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
                 <span class="text-sm font-bold text-slate-700">System Live</span>
             </div>
-            <button class="bg-white p-2 rounded-xl shadow-sm border border-slate-200 text-slate-600 hover:text-indigo-600 transition-colors">
-                <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12a9 9 0 0 1-9 9m9-9a9 9 0 0 0-9-9m9 9H3m9 9a9 9 0 0 1-9-9m9-9c1.657 0 3 4.03 3 9s-1.343 9-3 9m0-18c-1.657 0-3 4.03-3 9s1.343 9 3 9"/></svg>
-            </button>
         </div>
     </div>
 
@@ -103,41 +100,6 @@
                                     <svg xmlns="http://www.w3.org/2000/svg" class="w-3 h-3" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="m18 15-6-6-6 6"/></svg>
                                     2.4%
                                 </span>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- Stats Rows -->
-                    <div class="space-y-4 mb-8">
-                        <div class="flex items-center justify-between p-4 bg-slate-50/50 rounded-2xl border border-slate-100 hover:bg-slate-50 transition-colors">
-                            <div class="flex items-center gap-4">
-                                <div class="bg-emerald-100 text-emerald-600 p-2.5 rounded-xl">
-                                    <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
-                                </div>
-                                <div>
-                                    <p class="text-sm font-bold text-slate-800">Total Teachers</p>
-                                    <p class="text-[11px] text-slate-500 font-medium">Verified faculty members</p>
-                                </div>
-                            </div>
-                            <div class="flex items-center gap-6">
-                                <span class="text-xl font-black text-slate-800">{{ $totalTeachers }}</span>
-                                <a href="{{ route('admin.teachers.index') }}" class="text-[10px] font-black text-indigo-600 uppercase tracking-wider hover:text-indigo-800 transition-colors">View All</a>
-                            </div>
-                        </div>
-
-                        <div class="flex items-center justify-between p-4 bg-slate-50/50 rounded-2xl border border-slate-100 hover:bg-slate-50 transition-colors">
-                            <div class="flex items-center gap-4">
-                                <div class="bg-blue-100 text-blue-600 p-2.5 rounded-xl">
-                                    <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M17 3.13a4 4 0 0 1 0 7.75"/></svg>
-                                </div>
-                                <div>
-                                    <p class="text-sm font-bold text-slate-800">Total Students</p>
-                                    <p class="text-[11px] text-slate-500 font-medium">Currently enrolled students</p>
-                                </div>
-                            </div>
-                            <div class="flex items-center gap-6">
-                                <span class="text-xl font-black text-slate-800">{{ $totalStudents }}</span>
-                                <a href="{{ route('admin.students.index') }}" class="text-[10px] font-black text-blue-600 uppercase tracking-wider hover:text-blue-800 transition-colors">View All</a>
                             </div>
                         </div>
                     </div>
