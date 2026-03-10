@@ -3,7 +3,6 @@
 @section('content')
 @php
     $statMap = collect($stats)->keyBy('label');
-    $total = $statMap->get('Total Students');
     $avg = $statMap->get('Avg Grade');
     $att = $statMap->get('Attendance');
     $pending = $statMap->get('Pending Tasks');
@@ -28,17 +27,6 @@
 
 <!-- Stats Grid -->
 <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-5 md:gap-6 mb-10">
-    <div class="group relative bg-white/60 backdrop-blur-xl p-6 rounded-3xl shadow-[0_8px_30px_rgb(0,0,0,0.04)] border border-white hover:shadow-[0_8px_30px_rgb(59,130,246,0.15)] transition-all duration-300 hover:-translate-y-1 overflow-hidden">
-        <div class="absolute -right-6 -top-6 w-24 h-24 bg-blue-100 rounded-full blur-2xl opacity-50 group-hover:opacity-100 transition-opacity"></div>
-        <div class="flex justify-between items-start mb-4 relative z-10">
-            <div class="bg-gradient-to-br from-blue-400 to-blue-600 text-white p-3.5 rounded-2xl shadow-lg shadow-blue-200/50">
-                <svg xmlns="http://www.w3.org/2000/svg" class="w-6 h-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
-            </div>
-            <span class="{{ $total->trend_class ?? 'text-emerald-700 bg-emerald-100 border border-emerald-200' }} text-[11px] font-black px-2.5 py-1 rounded-full shadow-sm">{{ $total->trend_text ?? '+2.4%' }}</span>
-        </div>
-        <p class="text-xs text-slate-500 font-bold mb-1 uppercase tracking-widest relative z-10">Total Students</p>
-        <p class="text-3xl font-black text-slate-800 relative z-10">{{ $total->value ?? '0' }}</p>
-    </div>
 
     <div class="group relative bg-white/60 backdrop-blur-xl p-6 rounded-3xl shadow-[0_8px_30px_rgb(0,0,0,0.04)] border border-white hover:shadow-[0_8px_30px_rgb(16,185,129,0.15)] transition-all duration-300 hover:-translate-y-1 overflow-hidden">
         <div class="absolute -right-6 -top-6 w-24 h-24 bg-emerald-100 rounded-full blur-2xl opacity-50 group-hover:opacity-100 transition-opacity"></div>
@@ -84,7 +72,16 @@
             <div class="absolute top-0 right-0 w-64 h-64 bg-indigo-50/50 rounded-full blur-3xl opacity-60 -z-10"></div>
             <div class="px-8 py-6 border-b border-slate-100/80 bg-white/50 flex items-center justify-between">
                 <h2 class="text-xl font-black text-slate-800">Today's Schedule</h2>
-                <a href="{{ route('teacher.attendance.index') }}" class="text-sm font-bold text-indigo-600 hover:text-indigo-800 flex items-center gap-1.5 transition-colors bg-indigo-50 px-3 py-1.5 rounded-lg">Full Calendar <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m9 18 6-6-6-6"/></svg></a>
+                <div class="flex items-center gap-2">
+                    <a href="{{ route('teacher.schedule.index') }}" class="text-xs font-bold text-slate-500 hover:text-slate-800 px-3 py-1.5 rounded-lg bg-slate-50 border border-slate-200/70 flex items-center gap-1.5 transition-colors">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4"/><path d="M8 2v4"/><path d="M3 10h18"/></svg>
+                        Weekly View
+                    </a>
+                    <a href="{{ route('teacher.attendance.index') }}" class="text-sm font-bold text-indigo-600 hover:text-indigo-800 flex items-center gap-1.5 transition-colors bg-indigo-50 px-3 py-1.5 rounded-lg">
+                        Full Attendance
+                        <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m9 18 6-6-6-6"/></svg>
+                    </a>
+                </div>
             </div>
             <div class="p-8 space-y-5">
                 @forelse ($todaySchedule as $item)
@@ -92,7 +89,7 @@
                         $shadow = str_contains($item->color ?? '', 'blue') ? 'shadow-blue-200/50' : (str_contains($item->color ?? '', 'purple') ? 'shadow-purple-200/50' : (str_contains($item->color ?? '', 'indigo') ? 'shadow-indigo-200/50' : 'shadow-indigo-200/50'));
                         $bgClass = str_contains($item->color ?? '', 'blue') ? 'from-blue-400 to-blue-600' : (str_contains($item->color ?? '', 'purple') ? 'from-purple-400 to-purple-600' : (str_contains($item->color ?? '', 'indigo') ? 'from-indigo-400 to-indigo-600' : 'from-indigo-400 to-indigo-600'));
                     @endphp
-                    <div class="group flex items-center p-5 rounded-2xl border border-slate-100 bg-white/60 hover:border-indigo-100 hover:bg-indigo-50/40 hover:shadow-md transition-all duration-300 cursor-pointer hover:-translate-y-0.5">
+                    <div class="group flex items-center p-5 rounded-2xl border border-slate-100 bg-white/60 hover:border-indigo-100 hover:bg-indigo-50/40 hover:shadow-md transition-all duration-300 hover:-translate-y-0.5">
                         <div class="bg-gradient-to-br {{ $bgClass }} text-white p-4 rounded-2xl mr-6 shadow-lg {{ $shadow }} flex flex-col items-center justify-center min-w-[76px] transform group-hover:scale-105 transition-transform">
                             <svg xmlns="http://www.w3.org/2000/svg" class="w-6 h-6 mb-1.5 opacity-90" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
                             <span class="text-[11px] font-black uppercase tracking-wider">{{ $item->time_short }}</span>
@@ -114,6 +111,22 @@
                                     {{ $item->school_class ?? '' }}{{ !empty($item->school_class) && !empty($item->section) ? ' • ' : '' }}{{ $item->section ?? '' }}
                                 </div>
                             @endif
+                            <div class="mt-3 flex flex-wrap gap-2 text-xs font-bold">
+                                @if (!empty($item->school_class_id) && !empty($item->section_id))
+                                    <a href="{{ route('teacher.attendance.mark', ['class_id' => $item->school_class_id, 'section_id' => $item->section_id, 'date' => now()->toDateString()]) }}"
+                                       class="inline-flex items-center px-3 py-1.5 rounded-lg bg-emerald-50 text-emerald-700 border border-emerald-100 hover:bg-emerald-100 hover:border-emerald-200 transition-colors">
+                                        <svg xmlns="http://www.w3.org/2000/svg" class="w-3.5 h-3.5 mr-1" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg>
+                                        Mark Attendance
+                                    </a>
+                                @endif
+                                @if (!empty($item->school_class_id) && !empty($item->subject_id))
+                                    <a href="{{ route('teacher.grades.show', [$item->school_class_id, $item->subject_id]) }}"
+                                       class="inline-flex items-center px-3 py-1.5 rounded-lg bg-indigo-50 text-indigo-700 border border-indigo-100 hover:bg-indigo-100 hover:border-indigo-200 transition-colors">
+                                        <svg xmlns="http://www.w3.org/2000/svg" class="w-3.5 h-3.5 mr-1" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 3h18"/><path d="M9 7h10"/><path d="M3 7h2"/><path d="M9 11h10"/><path d="M3 11h2"/><path d="M9 15h10"/><path d="M3 15h2"/><path d="M9 19h10"/><path d="M3 19h2"/></svg>
+                                        Open Gradebook
+                                    </a>
+                                @endif
+                            </div>
                         </div>
                     </div>
                 @empty
@@ -128,23 +141,7 @@
             </div>
         </div>
 
-        <!-- Banner -->
-        <div class="group bg-gradient-to-r from-indigo-600 via-indigo-700 to-purple-800 rounded-3xl p-8 md:p-10 text-white relative overflow-hidden shadow-[0_10px_40px_rgba(79,70,229,0.3)] hover:shadow-[0_15px_50px_rgba(79,70,229,0.4)] transition-all duration-500">
-            <!-- Animated background elements -->
-            <div class="absolute inset-0 bg-[url('data:image/svg+xml,%3Csvg width=\'60\' height=\'60\' viewBox=\'0 0 60 60\' xmlns=\'http://www.w3.org/2000/svg\'%3E%3Cg fill=\'none\' fill-rule=\'evenodd\'%3E%3Cg fill=\'%23ffffff\' fill-opacity=\'0.05\'%3E%3Cpath d=\'M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z\'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E')] opacity-60"></div>
-            <div class="absolute -right-20 -top-20 w-64 h-64 bg-white rounded-full blur-3xl opacity-10 group-hover:scale-150 transition-transform duration-1000"></div>
-            <div class="absolute -left-20 -bottom-20 w-64 h-64 bg-purple-400 rounded-full blur-3xl opacity-20 group-hover:scale-150 transition-transform duration-1000"></div>
-            
-            <div class="relative z-10">
-                <span class="px-3.5 py-1.5 bg-white/20 backdrop-blur-md rounded-full text-[11px] font-black uppercase tracking-widest mb-5 inline-block border border-white/30 shadow-sm">Pro Feature</span>
-                <h2 class="text-2xl md:text-3xl font-black mb-4 tracking-tight text-white drop-shadow-sm">Automated Performance Reports</h2>
-                <p class="text-indigo-100 text-sm md:text-base mb-7 max-w-md leading-relaxed font-medium">Use AI to analyze student test scores and generate personalized feedback instantly.</p>
-                <a href="{{ route('teacher.grades.index') }}" class="inline-flex items-center gap-2 px-7 py-3.5 bg-white text-indigo-700 rounded-xl font-bold text-sm hover:shadow-xl hover:bg-slate-50 transition-all duration-300 transform group-hover:-translate-y-1">
-                    Generate Now
-                    <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg>
-                </a>
-            </div>
-        </div>
+        <!-- Banner removed: keep teacher dashboard focused on core features -->
     </div>
 
     <div class="space-y-6 md:space-y-8">

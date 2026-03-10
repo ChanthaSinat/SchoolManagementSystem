@@ -11,6 +11,7 @@ use App\Models\TeacherClass;
 use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Schema;
 use Illuminate\View\View;
 
 class GradeController extends Controller
@@ -159,7 +160,7 @@ class GradeController extends Controller
 
         $subject = Subject::find($subjectId);
         $schoolClass = SchoolClass::find($classId);
-        if (function_exists('activity')) {
+        if (function_exists('activity') && Schema::hasTable('activity_log')) {
             activity()
                 ->causedBy(auth()->user())
                 ->log("Updated gradebook for {$subject->name} {$schoolClass->name}");

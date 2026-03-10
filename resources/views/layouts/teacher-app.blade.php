@@ -48,6 +48,10 @@
                     <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5 mr-3 opacity-80" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m12 14 4-4"/><path d="M3.34 19a10 10 0 1 1 17.32 0"/></svg>
                     Grading
                 </a>
+                <a href="{{ route('teacher.exams.results') }}" class="flex items-center w-full px-4 py-3.5 rounded-xl {{ request()->routeIs('teacher.exams.results') ? 'bg-indigo-500 text-white shadow-lg shadow-indigo-500/30' : 'text-slate-300 hover:bg-slate-700/80 hover:text-white' }} font-semibold text-sm transition-colors">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5 mr-3 opacity-80" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
+                    Exam Results
+                </a>
             </nav>
 
             <div class="mt-auto pt-6 border-t border-slate-600/80">

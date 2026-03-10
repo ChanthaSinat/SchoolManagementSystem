@@ -17,13 +17,6 @@ class TeacherDashboardController extends Controller
         $teacherId = auth()->id();
         $teacherClassIds = TeacherClass::where('teacher_id', $teacherId)->pluck('school_class_id');
 
-        // Total students (distinct across teacher's classes)
-        $totalStudents = Enrollment::whereIn('school_class_id', $teacherClassIds)
-            ->where('status', 'active')
-            ->get()
-            ->unique('student_id')
-            ->count();
-
         // Average grade (teacher's graded entries)
         $grades = Grade::where('graded_by', $teacherId)->get();
         $gradesWithScore = $grades->filter(fn ($g) => $g->score !== null && $g->max_score > 0);
@@ -39,17 +32,23 @@ class TeacherDashboardController extends Controller
         $attendancePresent = $recentAttendance->where('status', 'present')->count();
         $attendanceRate = $attendanceTotal > 0 ? round(($attendancePresent / $attendanceTotal) * 100, 0) : 0;
 
+        // Pre-compute student counts per (class, section) to avoid N+1 queries
+        $studentCounts = Enrollment::whereIn('school_class_id', $teacherClassIds)
+            ->where('status', 'active')
+            ->selectRaw('school_class_id, section_id, COUNT(*) as total')
+            ->groupBy('school_class_id', 'section_id')
+            ->get()
+            ->keyBy(fn ($row) => $row->school_class_id . ':' . $row->section_id);
+
         // Today's schedule
         $todaySchedule = Timetable::where('user_id', $teacherId)
             ->where('day_of_week', strtolower(now()->format('l')))
             ->with(['subject', 'schoolClass', 'section'])
             ->orderBy('start_time')
             ->get()
-            ->map(function ($slot) {
-                $studentCount = Enrollment::where('school_class_id', $slot->school_class_id)
-                    ->where('section_id', $slot->section_id)
-                    ->where('status', 'active')
-                    ->count();
+            ->map(function ($slot) use ($studentCounts) {
+                $key = $slot->school_class_id . ':' . $slot->section_id;
+                $studentCount = $studentCounts[$key]->total ?? 0;
 
                 return (object) [
                     'id' => $slot->id,
@@ -61,6 +60,9 @@ class TeacherDashboardController extends Controller
                     'room' => $slot->room ?? '—',
                     'school_class' => $slot->schoolClass?->name,
                     'section' => $slot->section?->name,
+                    'school_class_id' => $slot->school_class_id,
+                    'section_id' => $slot->section_id,
+                    'subject_id' => $slot->subject_id,
                     'color' => ['bg-blue-500', 'bg-purple-500', 'bg-indigo-500', 'bg-teal-500'][$slot->subject_id % 4] ?? 'bg-indigo-500',
                 ];
             });
@@ -84,14 +86,6 @@ class TeacherDashboardController extends Controller
             });
 
         $stats = [
-            (object) [
-                'label' => 'Total Students',
-                'value' => (string) $totalStudents,
-                'color' => 'text-blue-600',
-                'bg' => 'bg-blue-100',
-                'trend_text' => '+2.4%',
-                'trend_class' => 'text-green-500 bg-green-50',
-            ],
             (object) [
                 'label' => 'Avg Grade',
                 'value' => $averageGrade . '%',

@@ -1,159 +1,201 @@
-<x-app-layout>
-    <x-slot name="header">
-        <h2 class="font-semibold text-xl text-gray-800 leading-tight">
-            {{ $schoolClass->name }} — {{ $section->name }} | {{ \Carbon\Carbon::parse($date)->format('M j, Y') }}
-            @if($existing->isNotEmpty())
-                <span class="ml-2 inline-flex items-center px-2.5 py-0.5 rounded text-xs font-medium bg-amber-100 text-amber-800">{{ __('Edit') }}</span>
-            @endif
-        </h2>
-    </x-slot>
+@extends('layouts.teacher-app')
 
-    <div class="py-12">
-        <div class="max-w-5xl mx-auto sm:px-6 lg:px-8">
-            <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg">
-                <div class="p-6">
-                    <div class="flex justify-between items-center mb-6">
-                        <a href="{{ route('teacher.attendance.index') }}" class="text-gray-600 hover:text-gray-900 text-sm">{{ __('Cancel') }}</a>
-                        <button type="button" id="mark-all-present" class="inline-flex items-center px-3 py-1.5 border border-transparent text-sm font-medium rounded text-white bg-green-600 hover:bg-green-700">
-                            {{ __('Mark All Present') }}
-                        </button>
-                    </div>
-
-                    <form action="{{ route('teacher.attendance.store') }}" method="POST" id="attendance-form">
-                        @csrf
-                        <input type="hidden" name="class_id" value="{{ $classId }}">
-                        <input type="hidden" name="section_id" value="{{ $sectionId }}">
-                        <input type="hidden" name="date" value="{{ $date }}">
-
-                        <div class="overflow-x-auto">
-                            <table class="min-w-full divide-y divide-gray-200">
-                                <thead class="bg-gray-50">
-                                    <tr>
-                                        <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase w-14">{{ __('') }}</th>
-                                        <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">{{ __('Student') }}</th>
-                                        <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">{{ __('Status') }}</th>
-                                        <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase min-w-[140px]">{{ __('Note') }}</th>
-                                    </tr>
-                                </thead>
-                                <tbody class="bg-white divide-y divide-gray-200">
-                                    @php
-                                        $colors = ['bg-indigo-500','bg-green-500','bg-amber-500','bg-red-500','bg-blue-500','bg-purple-500','bg-teal-500','bg-pink-500'];
-                                    @endphp
-                                    @foreach ($students as $enrollment)
-                                        @php
-                                            $sid = $enrollment->student_id;
-                                            $user = $enrollment->user;
-                                            $existingRecord = $existing->get($sid);
-                                            $status = $existingRecord ? $existingRecord->status : 'present';
-                                            $note = $existingRecord ? ($existingRecord->note ?? '') : '';
-                                            $initials = ($user ? mb_substr($user->first_name ?? '', 0, 1) . mb_substr($user->last_name ?? '', 0, 1) : '??');
-                                            $colorIndex = ord(mb_strtoupper(mb_substr($initials, 0, 1))) % count($colors);
-                                            $bgColor = $colors[$colorIndex];
-                                        @endphp
-                                        <tr class="attendance-row" data-student-id="{{ $sid }}">
-                                            <td class="px-4 py-3">
-                                                <div class="w-10 h-10 rounded-full {{ $bgColor }} flex items-center justify-center text-white text-sm font-medium" title="{{ $user->first_name ?? '' }} {{ $user->last_name ?? '' }}">
-                                                    {{ $initials }}
-                                                </div>
-                                            </td>
-                                            <td class="px-4 py-3">
-                                                <span class="font-medium text-gray-900">{{ $user->first_name ?? '' }} {{ $user->last_name ?? '' }}</span>
-                                                <span class="block text-xs text-gray-500">#{{ $enrollment->roll_number }}</span>
-                                            </td>
-                                            <td class="px-4 py-3">
-                                                <div class="flex gap-1 status-buttons">
-                                                    <button type="button" class="status-btn px-3 py-1 rounded text-sm font-medium border transition present-btn {{ $status === 'present' ? 'bg-green-600 text-white border-green-600' : 'bg-white text-gray-600 border-gray-300 hover:border-green-400' }}" data-status="present">✓ {{ __('Present') }}</button>
-                                                    <button type="button" class="status-btn px-3 py-1 rounded text-sm font-medium border transition absent-btn {{ $status === 'absent' ? 'bg-red-600 text-white border-red-600' : 'bg-white text-gray-600 border-gray-300 hover:border-red-400' }}" data-status="absent">✗ {{ __('Absent') }}</button>
-                                                    <button type="button" class="status-btn px-3 py-1 rounded text-sm font-medium border transition late-btn {{ $status === 'late' ? 'bg-amber-500 text-white border-amber-500' : 'bg-white text-gray-600 border-gray-300 hover:border-amber-400' }}" data-status="late">~ {{ __('Late') }}</button>
-                                                </div>
-                                                <input type="hidden" name="attendance[{{ $sid }}][status]" value="{{ $status }}" class="status-input">
-                                            </td>
-                                            <td class="px-4 py-3">
-                                                <input type="text" name="attendance[{{ $sid }}][note]" value="{{ old("attendance.{$sid}.note", $note) }}" placeholder="{{ __('Optional note') }}" class="block w-full text-sm rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500">
-                                            </td>
-                                        </tr>
-                                    @endforeach
-                                </tbody>
-                            </table>
-                        </div>
-
-                        <div id="summary-bar" class="mt-6 p-4 bg-gray-100 rounded-lg text-sm font-medium text-gray-700 sticky bottom-0">
-                            <span id="summary-text">✓ <span id="count-present">0</span> {{ __('Present') }} &nbsp; ✗ <span id="count-absent">0</span> {{ __('Absent') }} &nbsp; ~ <span id="count-late">0</span> {{ __('Late') }}</span>
-                        </div>
-
-                        <div class="mt-6 flex gap-4">
-                            <button type="submit" class="inline-flex justify-center items-center px-4 py-2 bg-indigo-600 text-white rounded-md hover:bg-indigo-700 focus:ring-2 focus:ring-indigo-500">
-                                {{ __('Save Attendance') }}
-                            </button>
-                            <a href="{{ route('teacher.attendance.index') }}" class="inline-flex items-center px-4 py-2 text-gray-700 hover:text-gray-900">{{ __('Cancel') }}</a>
-                        </div>
-                    </form>
-                </div>
+@section('content')
+<div class="max-w-6xl mx-auto space-y-8 pb-32">
+    <!-- Header Area -->
+    <div class="flex flex-col md:flex-row md:items-center justify-between gap-4">
+        <div>
+            <div class="flex items-center gap-3 mb-1">
+                <a href="{{ route('teacher.attendance.index') }}" class="p-2 bg-white rounded-xl border border-slate-200 text-slate-400 hover:text-indigo-600 hover:border-indigo-100 transition-all shadow-sm">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="m15 18-6-6 6-6"/></svg>
+                </a>
+                <h1 class="text-3xl font-black text-slate-900 tracking-tight">Mark Attendance</h1>
             </div>
+            <p class="text-slate-500 font-medium ml-12">{{ $schoolClass->name }} • Section {{ $section->name }} • {{ \Carbon\Carbon::parse($date)->format('M d, Y') }}</p>
+        </div>
+        <div class="flex items-center gap-3">
+            @if($existing->isNotEmpty())
+                <span class="px-3 py-1 bg-amber-50 text-amber-700 text-[10px] font-black rounded-full border border-amber-100 uppercase tracking-wider flex items-center gap-1.5">
+                    <span class="w-1.5 h-1.5 bg-amber-500 rounded-full animate-pulse"></span> Editing Existing
+                </span>
+            @endif
+            <button type="button" id="mark-all-present" class="bg-emerald-600 text-white px-6 py-3 rounded-2xl text-sm font-black hover:bg-emerald-700 shadow-lg shadow-emerald-200 active:scale-95 transition-all flex items-center gap-2">
+                <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg>
+                Mark All Present
+            </button>
         </div>
     </div>
 
-    <script>
-        (function() {
-            function updateSummary() {
-                var present = 0, absent = 0, late = 0;
-                document.querySelectorAll('.status-input').forEach(function(input) {
-                    var v = (input.value || '').trim();
-                    if (v === 'present') present++;
-                    else if (v === 'absent') absent++;
-                    else if (v === 'late') late++;
-                });
-                var elPresent = document.getElementById('count-present');
-                var elAbsent = document.getElementById('count-absent');
-                var elLate = document.getElementById('count-late');
-                if (elPresent) elPresent.textContent = present;
-                if (elAbsent) elAbsent.textContent = absent;
-                if (elLate) elLate.textContent = late;
-            }
+    <!-- Main Container -->
+    <div class="bg-white/60 backdrop-blur-xl rounded-[2.5rem] border border-white shadow-xl shadow-slate-200/50 overflow-hidden">
+        <form action="{{ route('teacher.attendance.store') }}" method="POST" id="attendance-form">
+            @csrf
+            <input type="hidden" name="class_id" value="{{ $classId }}">
+            <input type="hidden" name="section_id" value="{{ $sectionId }}">
+            <input type="hidden" name="date" value="{{ $date }}">
 
+            <div class="overflow-x-auto">
+                <table class="w-full text-left border-collapse">
+                    <thead>
+                        <tr class="bg-slate-50/50">
+                            <th class="px-8 py-5 text-[10px] font-black text-slate-400 uppercase tracking-widest border-b border-slate-100">Student Profile</th>
+                            <th class="px-8 py-5 text-[10px] font-black text-slate-400 uppercase tracking-widest border-b border-slate-100 text-center">Status Toggle</th>
+                            <th class="px-8 py-5 text-[10px] font-black text-slate-400 uppercase tracking-widest border-b border-slate-100">Optional Note</th>
+                        </tr>
+                    </thead>
+                    <tbody class="divide-y divide-slate-50">
+                        @php
+                            $colors = ['bg-indigo-500','bg-emerald-500','bg-amber-500','bg-rose-500','bg-sky-500','bg-violet-500','bg-teal-500','bg-fuchsia-500'];
+                        @endphp
+                        @foreach ($students as $enrollment)
+                            @php
+                                $sid = $enrollment->student_id;
+                                $user = $enrollment->user;
+                                $existingRecord = $existing->get($sid);
+                                $status = $existingRecord ? $existingRecord->status : 'present';
+                                $note = $existingRecord ? ($existingRecord->note ?? '') : '';
+
+                                // Compute display name and initials with safe fallbacks
+                                $displayName = $user
+                                    ? (trim(($user->first_name ?? '') . ' ' . ($user->last_name ?? '')) ?: ($user->full_name ?? $user->name ?? 'Student'))
+                                    : 'Student';
+
+                                $nameForInitials = $user ? ($user->full_name ?? $user->name ?? $displayName) : $displayName;
+                                $nameForInitials = trim($nameForInitials);
+                                $parts = preg_split('/\s+/', $nameForInitials);
+                                $firstInitial = isset($parts[0][0]) ? mb_substr($parts[0], 0, 1) : 'S';
+                                $secondInitial = isset($parts[1][0]) ? mb_substr($parts[1], 0, 1) : '';
+                                $initials = mb_strtoupper($firstInitial . $secondInitial);
+
+                                $colorIndex = ord(mb_strtoupper(mb_substr($initials, 0, 1))) % count($colors);
+                                $bgColor = $colors[$colorIndex];
+                            @endphp
+                            <tr class="attendance-row group hover:bg-slate-50/50 transition-colors" data-student-id="{{ $sid }}">
+                                <td class="px-8 py-5">
+                                    <div class="flex items-center gap-4">
+                                        <div class="w-12 h-12 rounded-2xl {{ $bgColor }} overflow-hidden flex items-center justify-center text-white font-black text-sm shadow-inner group-hover:scale-105 transition-transform duration-300">
+                                            {{ strtoupper($initials) }}
+                                        </div>
+                                        <div>
+                                            <p class="text-sm font-black text-slate-900 leading-tight">{{ $displayName }}</p>
+                                        </div>
+                                    </div>
+                                </td>
+                                <td class="px-8 py-5">
+                                    <div class="flex items-center justify-center gap-2 status-buttons">
+                                        <button type="button" class="status-btn px-4 py-2.5 rounded-xl text-xs font-black transition-all border-2 present-btn {{ $status === 'present' ? 'bg-emerald-50 text-emerald-600 border-emerald-500/20' : 'bg-white text-slate-400 border-slate-100 hover:border-emerald-200' }}" data-status="present">
+                                            Present
+                                        </button>
+                                        <button type="button" class="status-btn px-4 py-2.5 rounded-xl text-xs font-black transition-all border-2 absent-btn {{ $status === 'absent' ? 'bg-rose-50 text-rose-600 border-rose-500/20' : 'bg-white text-slate-400 border-slate-100 hover:border-rose-200' }}" data-status="absent">
+                                            Absent
+                                        </button>
+                                        <button type="button" class="status-btn px-4 py-2.5 rounded-xl text-xs font-black transition-all border-2 late-btn {{ $status === 'late' ? 'bg-amber-50 text-amber-600 border-amber-500/20' : 'bg-white text-slate-400 border-slate-100 hover:border-amber-200' }}" data-status="late">
+                                            Late
+                                        </button>
+                                    </div>
+                                    <input type="hidden" name="attendance[{{ $sid }}][status]" value="{{ $status }}" class="status-input">
+                                </td>
+                                <td class="px-8 py-5">
+                                    <div class="relative max-w-xs">
+                                        <input type="text" name="attendance[{{ $sid }}][note]" value="{{ old("attendance.{$sid}.note", $note) }}" placeholder="Optional note..." 
+                                            class="w-full px-4 py-2.5 bg-slate-50 border border-slate-100 rounded-xl text-xs font-medium placeholder:text-slate-300 focus:bg-white focus:border-indigo-400 focus:ring-4 focus:ring-indigo-500/5 outline-none transition-all">
+                                    </div>
+                                </td>
+                            </tr>
+                        @endforeach
+                    </tbody>
+                </table>
+            </div>
+        </form>
+    </div>
+
+    <!-- Floating Summary Bar -->
+    <div class="fixed bottom-10 left-1/2 -translate-x-1/2 z-30 flex items-center gap-2 p-2 bg-slate-900/90 backdrop-blur-xl border border-white/10 rounded-3xl shadow-[0_20px_50px_rgba(0,0,0,0.3)] min-w-[320px] transition-all duration-500 group">
+        <div id="summary-bar" class="flex-1 px-6 flex items-center justify-between gap-8">
+            <div class="flex items-center gap-6">
+                <div class="flex flex-col">
+                    <span class="text-[9px] font-black text-slate-500 uppercase tracking-widest leading-none mb-1">Present</span>
+                    <span id="count-present" class="text-lg font-black text-emerald-400 leading-none">0</span>
+                </div>
+                <div class="flex flex-col border-l border-white/10 pl-6">
+                    <span class="text-[9px] font-black text-slate-500 uppercase tracking-widest leading-none mb-1">Absent</span>
+                    <span id="count-absent" class="text-lg font-black text-rose-400 leading-none">0</span>
+                </div>
+                <div class="flex flex-col border-l border-white/10 pl-6">
+                    <span class="text-[9px] font-black text-slate-500 uppercase tracking-widest leading-none mb-1">Late</span>
+                    <span id="count-late" class="text-lg font-black text-amber-400 leading-none">0</span>
+                </div>
+            </div>
+        </div>
+        <button onclick="document.getElementById('attendance-form').submit()" class="px-6 py-4 bg-indigo-500 hover:bg-indigo-400 text-white rounded-2xl text-sm font-black transition-all active:scale-95 flex items-center gap-3">
+            Submit Records
+            <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg>
+        </button>
+    </div>
+</div>
+
+@push('scripts')
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        function updateSummary() {
+            var present = 0, absent = 0, late = 0;
+            document.querySelectorAll('.status-input').forEach(function(input) {
+                var v = (input.value || '').trim();
+                if (v === 'present') present++;
+                else if (v === 'absent') absent++;
+                else if (v === 'late') late++;
+            });
+            document.getElementById('count-present').textContent = present;
+            document.getElementById('count-absent').textContent = absent;
+            document.getElementById('count-late').textContent = late;
+        }
+
+        document.querySelectorAll('.attendance-row').forEach(function(row) {
+            var statusInput = row.querySelector('.status-input');
+            var btns = row.querySelectorAll('.status-btn');
+            
+            btns.forEach(function(btn) {
+                btn.addEventListener('click', function() {
+                    var status = btn.getAttribute('data-status');
+                    statusInput.value = status;
+                    
+                    btns.forEach(function(b) {
+                        var s = b.getAttribute('data-status');
+                        // Remove all active styles
+                        b.classList.remove('bg-emerald-50', 'text-emerald-600', 'border-emerald-500/20', 'bg-rose-50', 'text-rose-600', 'border-rose-500/20', 'bg-amber-50', 'text-amber-600', 'border-amber-500/20');
+                        b.classList.add('bg-white', 'text-slate-400', 'border-slate-100');
+                        
+                        if (s === status) {
+                            b.classList.remove('bg-white', 'text-slate-400', 'border-slate-100');
+                            if (s === 'present') b.classList.add('bg-emerald-50', 'text-emerald-600', 'border-emerald-500/20');
+                            else if (s === 'absent') b.classList.add('bg-rose-50', 'text-rose-600', 'border-rose-500/20');
+                            else if (s === 'late') b.classList.add('bg-amber-50', 'text-amber-600', 'border-amber-500/20');
+                        }
+                    });
+                    updateSummary();
+                });
+            });
+        });
+
+        document.getElementById('mark-all-present').addEventListener('click', function() {
             document.querySelectorAll('.attendance-row').forEach(function(row) {
                 var statusInput = row.querySelector('.status-input');
-                var btns = row.querySelectorAll('.status-btn');
-                if (!statusInput || !btns.length) return;
-
-                btns.forEach(function(btn) {
-                    btn.addEventListener('click', function() {
-                        var status = btn.getAttribute('data-status');
-                        statusInput.value = status;
-                        btns.forEach(function(b) {
-                            var s = b.getAttribute('data-status');
-                            b.classList.remove('bg-green-600', 'text-white', 'border-green-600', 'bg-red-600', 'border-red-600', 'bg-amber-500', 'border-amber-500');
-                            b.classList.add('bg-white', 'text-gray-600', 'border-gray-300');
-                            if (s === status) {
-                                b.classList.remove('bg-white', 'text-gray-600', 'border-gray-300');
-                                if (s === 'present') { b.classList.add('bg-green-600', 'text-white', 'border-green-600'); }
-                                else if (s === 'absent') { b.classList.add('bg-red-600', 'text-white', 'border-red-600'); }
-                                else if (s === 'late') { b.classList.add('bg-amber-500', 'text-white', 'border-amber-500'); }
-                            }
-                        });
-                        updateSummary();
+                var presentBtn = row.querySelector('.present-btn');
+                if (statusInput && presentBtn) {
+                    statusInput.value = 'present';
+                    row.querySelectorAll('.status-btn').forEach(function(b) {
+                        b.classList.remove('bg-emerald-50', 'text-emerald-600', 'border-emerald-500/20', 'bg-rose-50', 'text-rose-600', 'border-rose-500/20', 'bg-amber-50', 'text-amber-600', 'border-amber-500/20');
+                        b.classList.add('bg-white', 'text-slate-400', 'border-slate-100');
                     });
-                });
+                    presentBtn.classList.remove('bg-white', 'text-slate-400', 'border-slate-100');
+                    presentBtn.classList.add('bg-emerald-50', 'text-emerald-600', 'border-emerald-500/20');
+                }
             });
-
-            document.getElementById('mark-all-present').addEventListener('click', function() {
-                document.querySelectorAll('.attendance-row').forEach(function(row) {
-                    var statusInput = row.querySelector('.status-input');
-                    var presentBtn = row.querySelector('.present-btn');
-                    if (statusInput && presentBtn) {
-                        statusInput.value = 'present';
-                        row.querySelectorAll('.status-btn').forEach(function(b) {
-                            b.classList.remove('bg-green-600', 'text-white', 'border-green-600', 'bg-red-600', 'border-red-600', 'bg-amber-500', 'border-amber-500');
-                            b.classList.add('bg-white', 'text-gray-600', 'border-gray-300');
-                        });
-                        presentBtn.classList.remove('bg-white', 'text-gray-600', 'border-gray-300');
-                        presentBtn.classList.add('bg-green-600', 'text-white', 'border-green-600');
-                    }
-                });
-                updateSummary();
-            });
-
             updateSummary();
-        })();
-    </script>
-</x-app-layout>
+        });
+
+        updateSummary();
+    });
+</script>
+@endpush
+@endsection

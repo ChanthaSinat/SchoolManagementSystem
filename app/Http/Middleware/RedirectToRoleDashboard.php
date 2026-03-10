@@ -36,7 +36,7 @@ class RedirectToRoleDashboard
             }
         }
 
-        // No role or unknown role: redirect to student dashboard as default
-        return redirect()->route('student.dashboard');
+        // No role or unknown role: default behavior
+        return $next($request);
     }
 }

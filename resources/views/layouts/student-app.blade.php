@@ -49,6 +49,11 @@
                     <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5 mr-3 {{ request()->routeIs('student.attendance') ? 'text-white' : 'text-slate-500 group-hover:text-indigo-400' }} transition-colors" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
                     My Attendance
                 </a>
+
+                <a href="{{ route('student.exams.index') }}" class="flex items-center w-full px-4 py-3.5 rounded-xl {{ request()->routeIs('student.exams.*') ? 'bg-indigo-500 text-white shadow-lg shadow-indigo-500/30' : 'text-slate-400 hover:bg-slate-700/50 hover:text-white' }} font-bold text-sm transition-all group">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5 mr-3 {{ request()->routeIs('student.exams.*') ? 'text-white' : 'text-slate-500 group-hover:text-indigo-400' }} transition-colors" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 10v6M2 10l10-5 10 5-10 5z"/><path d="M6 12v5c3 3 9 3 12 0v-5"/></svg>
+                    Final Exams
+                </a>
             </nav>
 
             <div class="mt-auto pt-6 border-t border-slate-700">

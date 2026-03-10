@@ -12,6 +12,7 @@ use App\Models\TeacherClass;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Schema;
 use Illuminate\View\View;
 
 class AttendanceController extends Controller
@@ -127,6 +128,12 @@ class AttendanceController extends Controller
 
         $absentStudentIds = [];
 
+        // Remove any existing records for this class/section/date so we can safely recreate them
+        Attendance::where('school_class_id', $classId)
+            ->where('section_id', $sectionId)
+            ->whereDate('date', $date)
+            ->delete();
+
         foreach ($validated['attendance'] as $studentId => $row) {
             $status = $row['status'] ?? 'present';
             $note = $row['note'] ?? null;
@@ -135,33 +142,28 @@ class AttendanceController extends Controller
                 $absentStudentIds[] = (int) $studentId;
             }
 
-            Attendance::updateOrCreate(
-                [
-                    'student_id' => $studentId,
-                    'school_class_id' => $classId,
-                    'section_id' => $sectionId,
-                    'date' => $date,
-                ],
-                [
-                    'status' => $status,
-                    'note' => $note,
-                    'section_id' => $sectionId,
-                    'teacher_id' => $teacherId,
-                ]
-            );
+            Attendance::create([
+                'student_id' => $studentId,
+                'school_class_id' => $classId,
+                'section_id' => $sectionId,
+                'date' => $date,
+                'status' => $status,
+                'note' => $note,
+                'teacher_id' => $teacherId,
+            ]);
         }
 
         if (count($absentStudentIds) > 0) {
             NotifyAbsentParents::dispatch($absentStudentIds, $date, $classId);
         }
 
-        $schoolClass = SchoolClass::with('section')->find($classId);
+        $schoolClass = SchoolClass::find($classId);
         $section = Section::find($sectionId);
         $presentCount = collect($validated['attendance'])->where('status', 'present')->count();
         $absentCount = collect($validated['attendance'])->where('status', 'absent')->count();
         $lateCount = collect($validated['attendance'])->where('status', 'late')->count();
 
-        if (function_exists('activity')) {
+        if (function_exists('activity') && Schema::hasTable('activity_log')) {
             activity()
                 ->causedBy(auth()->user())
                 ->log("Marked attendance for {$schoolClass->name} {$section->name} on {$date} — {$presentCount} present, {$absentCount} absent, {$lateCount} late.");

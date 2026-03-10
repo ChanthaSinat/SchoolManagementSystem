@@ -12,14 +12,23 @@ class AdminDashboardController extends Controller
 {
     public function index(): View
     {
-        $totalUsers = User::count();
-        $totalTeachers = User::where('role', 'teacher')->orWhereHas('roles', fn ($q) => $q->where('name', 'teacher'))->count();
-        $totalStudents = User::where('role', 'student')->orWhereHas('roles', fn ($q) => $q->where('name', 'student'))->count();
+        $totalTeachers = User::where('role', 'teacher')
+            ->orWhereHas('roles', fn ($q) => $q->where('name', 'teacher'))
+            ->count();
+
+        $totalStudents = User::where(function ($q) {
+                $q->where('role', 'student')
+                  ->orWhereHas('roles', fn ($q) => $q->where('name', 'student'));
+            })
+            ->where(function ($q) {
+                $q->where('role', '!=', 'admin')
+                  ->whereDoesntHave('roles', fn ($q) => $q->where('name', 'admin'));
+            })
+            ->count();
         $totalClasses = SchoolClass::count();
         $activeEnrollments = Enrollment::where('status', 'active')->count();
 
         return view('admin.dashboard', [
-            'totalUsers' => $totalUsers,
             'totalTeachers' => $totalTeachers,
             'totalStudents' => $totalStudents,
             'totalClasses' => $totalClasses,

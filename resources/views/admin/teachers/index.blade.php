@@ -12,9 +12,9 @@
             <p class="text-slate-500 font-medium">Manage and monitor school faculty members.</p>
         </div>
         <div class="flex items-center gap-3">
-            <button class="bg-white p-2.5 rounded-xl shadow-sm border border-slate-200 text-slate-600 hover:text-indigo-600 transition-all hover:shadow-md">
-                <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" x2="12" y1="15" y2="3"/></svg>
-            </button>
+            <a href="{{ route('admin.dashboard') }}" class="bg-white p-2.5 rounded-xl shadow-sm border border-slate-200 text-slate-600 hover:text-indigo-600 transition-all hover:shadow-md" title="Back to admin dashboard">
+                <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/><line x1="9" x2="21" y1="12" y2="12"/></svg>
+            </a>
             <a href="{{ route('admin.teachers.create') }}" class="bg-indigo-600 text-white px-6 py-3 rounded-xl text-sm font-bold hover:bg-indigo-700 shadow-lg shadow-indigo-600/20 active:scale-95 transition-all flex items-center gap-2">
                 <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><line x1="12" x2="12" y1="5" y2="19"/><line x1="5" x2="19" y1="12" y2="12"/></svg>
                 Add Teacher
@@ -29,6 +29,14 @@
                 <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg>
             </div>
             <p class="text-sm font-bold">{{ session('success') }}</p>
+        </div>
+    @endif
+    @if (session('error'))
+        <div class="bg-rose-50 border border-rose-200 text-rose-800 px-6 py-4 rounded-2xl flex items-center gap-3 shadow-sm animate-in fade-in slide-in-from-top-4 duration-300">
+            <div class="bg-rose-500 text-white p-1 rounded-full">
+                <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M18 6 6 18M6 6l12 12"/></svg>
+            </div>
+            <p class="text-sm font-bold">{{ session('error') }}</p>
         </div>
     @endif
 
@@ -82,13 +90,19 @@
                             </td>
                             <td class="px-8 py-5 text-right">
                                 <div class="flex items-center justify-end gap-2 transform group-hover:translate-x-0 sm:translate-x-4 opacity-100 sm:opacity-0 group-hover:opacity-100 transition-all duration-300">
-                                    <a href="{{ route('admin.teachers.edit', $teacher) }}" class="p-2.5 bg-white text-indigo-600 border border-slate-200 rounded-xl hover:bg-indigo-600 hover:text-white hover:border-indigo-600 shadow-sm transition-all">
+                                    <form action="{{ route('admin.teachers.generate-schedule', $teacher) }}" method="POST" class="inline">
+                                        @csrf
+                                        <button type="submit" class="p-2.5 bg-white text-emerald-600 border border-slate-200 rounded-xl hover:bg-emerald-600 hover:text-white hover:border-emerald-600 shadow-sm transition-all" title="Generate random timetable">
+                                            <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 4h18"/><path d="M3 10h18"/><path d="M3 16h18"/><path d="M8 2v4"/><path d="M16 8v4"/><path d="M10 14v4"/></svg>
+                                        </button>
+                                    </form>
+                                    <a href="{{ route('admin.teachers.edit', $teacher) }}" class="p-2.5 bg-white text-indigo-600 border border-slate-200 rounded-xl hover:bg-indigo-600 hover:text-white hover:border-indigo-600 shadow-sm transition-all" title="Edit teacher & classes">
                                         <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 3a2.85 2.83 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5Z"/><path d="m15 5 4 4"/></svg>
                                     </a>
                                     <form action="{{ route('admin.users.destroy', $teacher) }}" method="POST" class="inline" onsubmit="return confirm('{{ __('Remove this teacher? Their classes and related data will be affected.') }}');">
                                         @csrf
                                         @method('DELETE')
-                                        <button type="submit" class="p-2.5 bg-white text-rose-600 border border-slate-200 rounded-xl hover:bg-rose-600 hover:text-white hover:border-rose-600 shadow-sm transition-all">
+                                        <button type="submit" class="p-2.5 bg-white text-rose-600 border border-slate-200 rounded-xl hover:bg-rose-600 hover:text-white hover:border-rose-600 shadow-sm transition-all" title="Remove teacher">
                                             <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h18"/><path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6"/><path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2"/><line x1="10" x2="10" y1="11" y2="17"/><line x1="14" x2="14" y1="11" y2="17"/></svg>
                                         </button>
                                     </form>

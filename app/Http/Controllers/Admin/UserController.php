@@ -11,6 +11,7 @@ use App\Models\TeacherClass;
 use App\Models\User;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Artisan;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\View\View;
 
@@ -67,8 +68,16 @@ class UserController extends Controller
     public function students(): View
     {
         $students = User::where(function ($q) {
-            $q->where('role', 'student')->orWhereHas('roles', fn ($q) => $q->where('name', 'student'));
-        })->orderBy('first_name')->orderBy('last_name')->get();
+            $q->where('role', 'student')
+              ->orWhereHas('roles', fn ($q) => $q->where('name', 'student'));
+        })
+        ->where(function ($q) {
+            $q->where('role', '!=', 'admin')
+              ->whereDoesntHave('roles', fn ($q) => $q->where('name', 'admin'));
+        })
+        ->orderBy('first_name')
+        ->orderBy('last_name')
+        ->get();
 
         return view('admin.students.index', ['students' => $students]);
     }
@@ -188,5 +197,22 @@ class UserController extends Controller
         $route = $wasTeacher ? 'admin.teachers.index' : 'admin.students.index';
 
         return redirect()->route($route)->with('success', __('User removed successfully.'));
+    }
+
+    public function generateSchedule(User $user): RedirectResponse
+    {
+        if (! $user->hasRole('teacher') && $user->role !== 'teacher') {
+            return redirect()
+                ->route('admin.teachers.index')
+                ->with('error', __('Selected user is not a teacher.'));
+        }
+
+        Artisan::call('schedule:random-teacher', [
+            'teacherId' => $user->id,
+        ]);
+
+        return redirect()
+            ->route('admin.teachers.index')
+            ->with('success', __('Random schedule generated for :name.', ['name' => $user->name]));
     }
 }

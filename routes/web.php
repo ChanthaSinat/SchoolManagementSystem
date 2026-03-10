@@ -13,6 +13,7 @@ use App\Http\Controllers\Teacher\GradeController;
 use App\Http\Controllers\Teacher\ScheduleController;
 use App\Http\Controllers\Teacher\StudentsController;
 use App\Http\Controllers\Teacher\TeacherDashboardController;
+use App\Http\Controllers\Student\ExamController as StudentExamController;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', function () {
@@ -34,6 +35,10 @@ Route::middleware(['auth', 'verified', 'role:admin'])->prefix('admin')->name('ad
     Route::get('/students/{user}/edit', [AdminUserController::class, 'editStudent'])->name('students.edit');
     Route::put('/users/{user}', [AdminUserController::class, 'update'])->name('users.update');
     Route::delete('/users/{user}', [AdminUserController::class, 'destroy'])->name('users.destroy');
+
+    // Admin tools
+    Route::post('/teachers/{user}/generate-schedule', [AdminUserController::class, 'generateSchedule'])
+        ->name('teachers.generate-schedule');
 });
 
 Route::middleware(['auth', 'verified', 'role.teacher'])->prefix('teacher')->name('teacher.')->group(function () {
@@ -49,6 +54,9 @@ Route::middleware(['auth', 'verified', 'role.teacher'])->prefix('teacher')->name
     Route::get('/students', [StudentsController::class, 'index'])->name('students.index');
     Route::get('/curriculum', [CurriculumController::class, 'index'])->name('curriculum.index');
     Route::get('/schedule', [ScheduleController::class, 'index'])->name('schedule.index');
+    
+    // Exam Results for Teacher
+    Route::get('/exams/results', [StudentExamController::class, 'teacherResults'])->name('exams.results');
 });
 
 Route::middleware(['auth', 'verified', 'role.student'])->prefix('student')->name('student.')->group(function () {
@@ -56,6 +64,13 @@ Route::middleware(['auth', 'verified', 'role.student'])->prefix('student')->name
     Route::get('/timetable', [StudentTimetableController::class, 'index'])->name('timetable');
     Route::get('/grades', [StudentGradeController::class, 'index'])->name('grades');
     Route::get('/attendance', [StudentAttendanceController::class, 'index'])->name('attendance');
+
+    // Final Exam Routes
+    Route::get('/exams', [StudentExamController::class, 'index'])->name('exams.index');
+    Route::post('/exams/start', [StudentExamController::class, 'start'])->name('exams.start');
+    Route::get('/exams/{attempt}/take', [StudentExamController::class, 'take'])->name('exams.take');
+    Route::post('/exams/{attempt}/store', [StudentExamController::class, 'store'])->name('exams.store');
+    Route::get('/exams/{attempt}/results', [StudentExamController::class, 'results'])->name('exams.results');
 });
 
 Route::middleware('auth')->group(function () {

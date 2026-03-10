@@ -166,10 +166,10 @@
                 <div class="absolute inset-0 bg-[radial-gradient(circle_at_30%_50%,rgba(79,70,229,0.15),transparent_50%)]"></div>
                 <div class="relative z-10 flex flex-col md:flex-row items-center gap-8">
                     <div class="flex-1">
-                        <span class="px-3 py-1 bg-white/10 backdrop-blur-md rounded-lg text-[10px] font-black uppercase tracking-[0.2em] mb-4 inline-block border border-white/10">Personalized</span>
-                        <h2 class="text-3xl font-black mb-3 leading-tight">Ready for Midterms?</h2>
-                        <p class="text-slate-400 text-sm max-w-md mb-6 leading-relaxed font-medium">Generate AI-powered practice quizzes based on your specific subject curriculum.</p>
-                        <button class="bg-indigo-600 hover:bg-indigo-500 text-white px-8 py-3.5 rounded-xl font-bold text-sm transition-all shadow-lg shadow-indigo-600/20 active:scale-95">Start Practice</button>
+                        <span class="px-3 py-1 bg-white/10 backdrop-blur-md rounded-lg text-[10px] font-black uppercase tracking-[0.2em] mb-4 inline-block border border-white/10">Academic Milestone</span>
+                        <h2 class="text-3xl font-black mb-3 leading-tight">Begin your Final Exam</h2>
+                        <p class="text-slate-400 text-sm max-w-md mb-6 leading-relaxed font-medium">Test your knowledge across all subjects in this final assessment session.</p>
+                        <a href="{{ route('student.exams.index') }}" class="inline-block bg-indigo-600 hover:bg-indigo-500 text-white px-8 py-3.5 rounded-xl font-bold text-sm transition-all shadow-lg shadow-indigo-600/20 active:scale-95">Start Assessment</a>
                     </div>
                     <div class="hidden md:block w-32 h-32 opacity-20 group-hover:scale-110 group-hover:rotate-12 transition-transform duration-700">
                         <svg xmlns="http://www.w3.org/2000/svg" class="w-full h-full" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path d="M12 14l9-5-9-5-9 5 9 5z" /><path d="M12 14l6.16-3.422a12.083 12.083 0 01.665 6.479A11.952 11.952 0 0012 20.055a11.952 11.952 0 00-6.824-2.998 12.078 12.078 0 01.665-6.479L12 14z" /><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 14l9-5-9-5-9 5 9 5zm0 0l6.16-3.422a12.083 12.083 0 01.665 6.479A11.952 11.952 0 0012 20.055a11.952 11.952 0 00-6.824-2.998 12.078 12.078 0 01.665-6.479L12 14zm-4 6v-7.5l4-2.222" /></svg>

@@ -21,19 +21,6 @@
 
     <!-- Stats Grid -->
     <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-        <!-- Total Users -->
-        <div class="group bg-white/60 backdrop-blur-xl p-6 rounded-3xl border border-white shadow-sm hover:shadow-xl hover:shadow-indigo-500/5 transition-all duration-300 hover:-translate-y-1 relative overflow-hidden">
-            <div class="absolute -right-4 -top-4 w-24 h-24 bg-indigo-50 rounded-full blur-2xl opacity-50 group-hover:opacity-100 transition-opacity"></div>
-            <div class="flex items-start justify-between relative z-10 mb-4">
-                <div class="bg-gradient-to-br from-indigo-500 to-indigo-600 text-white p-3 rounded-2xl shadow-lg shadow-indigo-200 font-bold">
-                    <svg xmlns="http://www.w3.org/2000/svg" class="w-6 h-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
-                </div>
-                <div class="bg-indigo-50 text-indigo-700 text-[10px] font-black px-2 py-1 rounded-lg border border-indigo-100 uppercase tracking-wider">Total</div>
-            </div>
-            <p class="text-slate-500 text-xs font-black uppercase tracking-widest mb-1 relative z-10">Total Users</p>
-            <h3 class="text-3xl font-black text-slate-800 relative z-10">{{ $totalUsers }}</h3>
-        </div>
-
         <!-- Teachers -->
         <div class="group bg-white/60 backdrop-blur-xl p-6 rounded-3xl border border-white shadow-sm hover:shadow-xl hover:shadow-emerald-500/5 transition-all duration-300 hover:-translate-y-1 relative overflow-hidden">
             <div class="absolute -right-4 -top-4 w-24 h-24 bg-emerald-50 rounded-full blur-2xl opacity-50 group-hover:opacity-100 transition-opacity"></div>
@@ -43,7 +30,7 @@
                 </div>
                 <div class="bg-emerald-50 text-emerald-700 text-[10px] font-black px-2 py-1 rounded-lg border border-emerald-100 uppercase tracking-wider">Active</div>
             </div>
-            <p class="text-slate-500 text-xs font-black uppercase tracking-widest mb-1 relative z-10">Teachers</p>
+            <p class="text-slate-500 text-xs font-black uppercase tracking-widest mb-1 relative z-10">Total Teachers</p>
             <h3 class="text-3xl font-black text-slate-800 relative z-10">{{ $totalTeachers }}</h3>
         </div>
 
@@ -56,7 +43,7 @@
                 </div>
                 <div class="bg-blue-50 text-blue-700 text-[10px] font-black px-2 py-1 rounded-lg border border-blue-100 uppercase tracking-wider">Enrolled</div>
             </div>
-            <p class="text-slate-500 text-xs font-black uppercase tracking-widest mb-1 relative z-10">Students</p>
+            <p class="text-slate-500 text-xs font-black uppercase tracking-widest mb-1 relative z-10">Total Students</p>
             <h3 class="text-3xl font-black text-slate-800 relative z-10">{{ $totalStudents }}</h3>
         </div>
 
@@ -71,6 +58,19 @@
             </div>
             <p class="text-slate-500 text-xs font-black uppercase tracking-widest mb-1 relative z-10">Classes</p>
             <h3 class="text-3xl font-black text-slate-800 relative z-10">{{ $totalClasses }}</h3>
+        </div>
+
+        <!-- Active Context -->
+        <div class="group bg-white/60 backdrop-blur-xl p-6 rounded-3xl border border-white shadow-sm hover:shadow-xl hover:shadow-indigo-500/5 transition-all duration-300 hover:-translate-y-1 relative overflow-hidden">
+            <div class="absolute -right-4 -top-4 w-24 h-24 bg-indigo-50 rounded-full blur-2xl opacity-50 group-hover:opacity-100 transition-opacity"></div>
+            <div class="flex items-start justify-between relative z-10 mb-4">
+                <div class="bg-gradient-to-br from-indigo-500 to-indigo-600 text-white p-3 rounded-2xl shadow-lg shadow-indigo-200 font-bold">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="w-6 h-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+                </div>
+                <div class="bg-indigo-50 text-indigo-700 text-[10px] font-black px-2 py-1 rounded-lg border border-indigo-100 uppercase tracking-wider">Operational</div>
+            </div>
+            <p class="text-slate-500 text-xs font-black uppercase tracking-widest mb-1 relative z-10">Active Slots</p>
+            <h3 class="text-3xl font-black text-slate-800 relative z-10">{{ $activeEnrollments }}</h3>
         </div>
     </div>
 
@@ -107,6 +107,41 @@
                         </div>
                     </div>
 
+                    <!-- Stats Rows -->
+                    <div class="space-y-4 mb-8">
+                        <div class="flex items-center justify-between p-4 bg-slate-50/50 rounded-2xl border border-slate-100 hover:bg-slate-50 transition-colors">
+                            <div class="flex items-center gap-4">
+                                <div class="bg-emerald-100 text-emerald-600 p-2.5 rounded-xl">
+                                    <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+                                </div>
+                                <div>
+                                    <p class="text-sm font-bold text-slate-800">Total Teachers</p>
+                                    <p class="text-[11px] text-slate-500 font-medium">Verified faculty members</p>
+                                </div>
+                            </div>
+                            <div class="flex items-center gap-6">
+                                <span class="text-xl font-black text-slate-800">{{ $totalTeachers }}</span>
+                                <a href="{{ route('admin.teachers.index') }}" class="text-[10px] font-black text-indigo-600 uppercase tracking-wider hover:text-indigo-800 transition-colors">View All</a>
+                            </div>
+                        </div>
+
+                        <div class="flex items-center justify-between p-4 bg-slate-50/50 rounded-2xl border border-slate-100 hover:bg-slate-50 transition-colors">
+                            <div class="flex items-center gap-4">
+                                <div class="bg-blue-100 text-blue-600 p-2.5 rounded-xl">
+                                    <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M17 3.13a4 4 0 0 1 0 7.75"/></svg>
+                                </div>
+                                <div>
+                                    <p class="text-sm font-bold text-slate-800">Total Students</p>
+                                    <p class="text-[11px] text-slate-500 font-medium">Currently enrolled students</p>
+                                </div>
+                            </div>
+                            <div class="flex items-center gap-6">
+                                <span class="text-xl font-black text-slate-800">{{ $totalStudents }}</span>
+                                <a href="{{ route('admin.students.index') }}" class="text-[10px] font-black text-blue-600 uppercase tracking-wider hover:text-blue-800 transition-colors">View All</a>
+                            </div>
+                        </div>
+                    </div>
+
                     <h3 class="text-sm font-black text-slate-800 uppercase tracking-widest mb-4">Quick Management</h3>
                     <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
                         <a href="{{ route('admin.teachers.index') }}" class="flex items-center justify-between p-4 bg-white border border-slate-200 rounded-2xl hover:border-indigo-300 hover:shadow-lg hover:shadow-indigo-500/5 transition-all group">
@@ -137,22 +172,9 @@
                 </div>
             </div>
 
-            <div class="bg-gradient-to-br from-slate-800 to-slate-900 rounded-3xl p-8 text-white relative overflow-hidden shadow-xl shadow-slate-200">
-                <div class="absolute top-0 right-0 w-64 h-64 bg-indigo-500/20 rounded-full blur-3xl opacity-50 -mr-20 -mt-20"></div>
-                <div class="relative z-10">
-                    <h2 class="text-xl font-black mb-2">Pro Administrator Hub</h2>
-                    <p class="text-slate-400 text-sm mb-6 max-w-sm">Access advanced analytics, bulk user management, and detailed school performance audits.</p>
-                    <button class="bg-indigo-600 hover:bg-indigo-500 text-white px-6 py-3 rounded-xl text-sm font-bold transition-all shadow-lg shadow-indigo-600/30 active:scale-95">
-                        Upgrade Workspace
-                    </button>
-                </div>
-                <div class="absolute right-8 bottom-8 opacity-10">
-                    <svg xmlns="http://www.w3.org/2000/svg" class="w-32 h-32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/></svg>
-                </div>
-            </div>
         </div>
 
-        <!-- System Notifications & Health -->
+        <!-- System Health -->
         <div class="space-y-8">
             <div class="bg-white/80 backdrop-blur-xl rounded-3xl border border-white shadow-sm p-8">
                 <h2 class="text-lg font-black text-slate-800 mb-6 flex items-center gap-2">
@@ -208,35 +230,6 @@
                 </div>
             </div>
 
-            <div class="bg-white/80 backdrop-blur-xl rounded-3xl border border-white shadow-sm p-8">
-                <h2 class="text-lg font-black text-slate-800 mb-6 font-bold uppercase tracking-widest text-xs">Security Logs</h2>
-                <div class="space-y-6 relative before:absolute before:left-2.5 before:top-2 before:bottom-2 before:w-0.5 before:bg-slate-100">
-                    <div class="relative pl-8">
-                        <div class="absolute left-0 top-1 w-5 h-5 bg-white border-4 border-slate-50 rounded-full shadow-sm flex items-center justify-center">
-                            <div class="w-1.5 h-1.5 bg-indigo-500 rounded-full"></div>
-                        </div>
-                        <p class="text-xs font-bold text-slate-800">New login from Chrome</p>
-                        <p class="text-[10px] text-slate-500 font-medium mt-0.5">2 minutes ago</p>
-                    </div>
-                    <div class="relative pl-8">
-                        <div class="absolute left-0 top-1 w-5 h-5 bg-white border-4 border-slate-50 rounded-full shadow-sm flex items-center justify-center">
-                            <div class="w-1.5 h-1.5 bg-slate-300 rounded-full"></div>
-                        </div>
-                        <p class="text-xs font-bold text-slate-800">Role updated: Teacher</p>
-                        <p class="text-[10px] text-slate-500 font-medium mt-0.5">1 hour ago</p>
-                    </div>
-                    <div class="relative pl-8">
-                        <div class="absolute left-0 top-1 w-5 h-5 bg-white border-4 border-slate-50 rounded-full shadow-sm flex items-center justify-center">
-                            <div class="w-1.5 h-1.5 bg-slate-300 rounded-full"></div>
-                        </div>
-                        <p class="text-xs font-bold text-slate-800">Backup completed</p>
-                        <p class="text-[10px] text-slate-500 font-medium mt-0.5">Yesterday, 11:42 PM</p>
-                    </div>
-                </div>
-                <button class="w-full mt-8 py-3 bg-slate-50 hover:bg-slate-100 text-slate-600 border border-slate-200 rounded-2xl text-[10px] font-black uppercase tracking-[0.2em] transition-all">
-                    Full Security Report
-                </button>
-            </div>
         </div>
     </div>
 </div>
