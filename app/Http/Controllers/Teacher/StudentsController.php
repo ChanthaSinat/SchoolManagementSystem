@@ -3,8 +3,8 @@
 namespace App\Http\Controllers\Teacher;
 
 use App\Http\Controllers\Controller;
-use App\Models\Enrollment;
-use App\Models\TeacherClass;
+use App\Models\ClassSchedule;
+use App\Models\SchoolClass;
 use Illuminate\View\View;
 
 class StudentsController extends Controller
@@ -12,38 +12,48 @@ class StudentsController extends Controller
     public function index(): View
     {
         $teacherId = auth()->id();
-        $classIds = TeacherClass::where('teacher_id', $teacherId)->pluck('school_class_id');
+        // Classes where this teacher appears in the weekly schedule
+        $classIds = ClassSchedule::where('teacher_id', $teacherId)
+            ->pluck('school_class_id')
+            ->unique()
+            ->values();
 
-        $enrollments = Enrollment::whereIn('school_class_id', $classIds)
-            ->where('status', 'active')
-            ->with(['user', 'schoolClass', 'section'])
-            ->orderBy('school_class_id')
-            ->orderBy('section_id')
-            ->orderBy('roll_number')
-            ->get()
-            // Exclude any admin users from the teacher's student list
-            ->filter(function ($enrollment) {
-                $user = $enrollment->user;
-                if (! $user) {
-                    return false;
+        $classes = SchoolClass::with('students')
+            ->whereIn('id', $classIds)
+            ->get();
+
+        // Build a flattened list of students with the classes they appear in
+        $byStudent = [];
+
+        foreach ($classes as $class) {
+            foreach ($class->students as $student) {
+                // Skip admins
+                if ($student->role === 'admin' || $student->hasRole('admin')) {
+                    continue;
                 }
 
-                return $user->role !== 'admin' && ! $user->hasRole('admin');
-            });
+                $id = $student->id;
+                if (! isset($byStudent[$id])) {
+                    $byStudent[$id] = (object) [
+                        'user' => $student,
+                        'roll_number' => $student->pivot->roll_number ?? null,
+                        'class_names' => collect([$class->name]),
+                    ];
+                } else {
+                    $byStudent[$id]->class_names->push($class->name);
+                }
+            }
+        }
 
-        // One row per distinct student (with their primary class/section for display)
-        $students = $enrollments->unique('student_id')->map(function ($e) use ($enrollments) {
-            $classes = $enrollments->where('student_id', $e->student_id)->pluck('schoolClass.name')->unique()->join(', ');
-            $sections = $enrollments->where('student_id', $e->student_id)->pluck('section.name')->unique()->join(', ');
+        $students = collect($byStudent)
+            ->map(function ($row) {
+                $row->class_names = $row->class_names->unique()->join(', ');
+                return $row;
+            })
+            ->values();
 
-            return (object) [
-                'user' => $e->user,
-                'roll_number' => $e->roll_number,
-                'class_names' => $classes,
-                'section_names' => $sections,
-            ];
-        })->values();
-
-        return view('teacher.students.index', ['students' => $students]);
+        return view('teacher.students.index', [
+            'students' => $students,
+        ]);
     }
 }

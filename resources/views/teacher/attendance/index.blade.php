@@ -42,7 +42,7 @@
         </div>
     @endif
 
-    <!-- Selection Glassmorphism Card -->
+    <!-- New Attendance Session -->
     <div class="bg-white/60 backdrop-blur-xl rounded-[2.5rem] border border-white shadow-xl shadow-slate-200/50 overflow-hidden">
         <div class="p-8 sm:p-10">
             <div class="flex items-center gap-3 mb-8">
@@ -51,27 +51,20 @@
                 </div>
                 <div>
                     <h3 class="text-xl font-black text-slate-900 tracking-tight">New Attendance Session</h3>
-                    <p class="text-slate-500 text-sm font-medium">Select your class and section to begin marking.</p>
+                    <p class="text-slate-500 text-sm font-medium">Select your class and date to begin marking.</p>
                 </div>
             </div>
 
             <form action="{{ route('teacher.attendance.mark') }}" method="GET" id="attendance-form">
-                <div class="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 gap-6 items-end">
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-6 items-end">
                     <div class="space-y-2">
                         <label for="class_id" class="text-[11px] font-black text-slate-400 uppercase tracking-[0.15em] ml-1">{{ __('Class') }}</label>
                         <select name="class_id" id="class_id" required
                             class="w-full px-4 py-3.5 bg-white border border-slate-200 rounded-2xl text-sm font-bold text-slate-700 outline-none focus:ring-4 focus:ring-indigo-500/10 focus:border-indigo-400 transition-all appearance-none cursor-pointer">
                             <option value="">{{ __('Select Class') }}</option>
                             @foreach ($classes as $c)
-                                <option value="{{ $c->id }}" data-sections='@json($c->sections->map(fn($s) => ['id' => $s->id, 'name' => $s->name]))' {{ request('class_id') == $c->id ? 'selected' : '' }}>{{ $c->name }}</option>
+                                <option value="{{ $c->id }}" {{ request('class_id') == $c->id ? 'selected' : '' }}>{{ $c->name }}</option>
                             @endforeach
-                        </select>
-                    </div>
-                    <div class="space-y-2">
-                        <label for="section_id" class="text-[11px] font-black text-slate-400 uppercase tracking-[0.15em] ml-1">{{ __('Section') }}</label>
-                        <select name="section_id" id="section_id" required
-                            class="w-full px-4 py-3.5 bg-white border border-slate-200 rounded-2xl text-sm font-bold text-slate-700 outline-none focus:ring-4 focus:ring-indigo-500/10 focus:border-indigo-400 transition-all appearance-none cursor-pointer">
-                            <option value="">{{ __('Select Section') }}</option>
                         </select>
                     </div>
                     <div class="space-y-2">
@@ -174,8 +167,8 @@
                                     <div class="w-20 h-20 bg-slate-50 rounded-3xl flex items-center justify-center mb-6 border border-slate-100">
                                         <svg xmlns="http://www.w3.org/2000/svg" class="w-10 h-10 text-slate-300" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
                                     </div>
-                                    <h3 class="text-xl font-black text-slate-800 tracking-tight">No Recent Sessions</h3>
-                                    <p class="text-slate-500 text-sm max-w-xs mt-2 font-medium">You haven't marked any attendance in the last 14 days.</p>
+                                    <h3 class="text-xl font-black text-slate-800 tracking-tight">No Attendance Data</h3>
+                                    <p class="text-slate-500 text-sm max-w-xs mt-2 font-medium">Attendance tracking is currently disabled for this simplified Grade 12 setup.</p>
                                 </div>
                             </td>
                         </tr>
@@ -186,30 +179,4 @@
     </div>
 </div>
 
-@push('scripts')
-<script>
-    (function() {
-        var classSelect = document.getElementById('class_id');
-        var sectionSelect = document.getElementById('section_id');
-        var selectedSectionId = '{{ request('section_id') }}';
-        function updateSections() {
-            var opt = classSelect.options[classSelect.selectedIndex];
-            sectionSelect.innerHTML = '<option value="">Select section</option>';
-            if (!opt || !opt.value) return;
-            try {
-                var sections = JSON.parse(opt.getAttribute('data-sections') || '[]');
-                sections.forEach(function(s) {
-                    var o = document.createElement('option');
-                    o.value = s.id;
-                    o.textContent = s.name;
-                    if (String(s.id) === String(selectedSectionId)) o.selected = true;
-                    sectionSelect.appendChild(o);
-                });
-            } catch (e) {}
-        }
-        classSelect.addEventListener('change', updateSections);
-        updateSections();
-    })();
-</script>
-@endpush
 @endsection

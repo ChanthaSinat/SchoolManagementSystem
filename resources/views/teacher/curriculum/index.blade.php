@@ -14,9 +14,6 @@
             <div class="p-6">
                 <p class="text-xs font-bold text-indigo-600 uppercase tracking-wider">{{ __('Class') }}</p>
                 <p class="mt-2.5 text-lg font-bold text-slate-800 group-hover:text-indigo-700 transition-colors">{{ $item->class_name }}</p>
-                <p class="mt-1.5 text-sm text-slate-600 font-medium">
-                    {{ __('Section') }}: {{ $item->sections->isEmpty() ? __('All') : $item->sections->pluck('name')->join(', ') }}
-                </p>
                 <p class="mt-2 text-sm font-semibold text-slate-700">{{ __('Subjects') }}:</p>
                 <ul class="mt-1 text-sm text-slate-600 space-y-0.5">
                     @forelse ($item->subjects as $subject)

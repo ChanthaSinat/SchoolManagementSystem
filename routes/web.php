@@ -1,7 +1,7 @@
 <?php
 
 use App\Http\Controllers\Admin\AdminDashboardController;
-use App\Http\Controllers\Admin\ScheduleController as AdminScheduleController;
+use App\Http\Controllers\Admin\ClassController as AdminClassController;
 use App\Http\Controllers\Admin\UserController as AdminUserController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\Student\StudentAttendanceController;
@@ -25,7 +25,6 @@ Route::get('/dashboard', function () {
 
 Route::middleware(['auth', 'verified', 'role:admin'])->prefix('admin')->name('admin.')->group(function () {
     Route::get('/dashboard', [AdminDashboardController::class, 'index'])->name('dashboard');
-    Route::get('/schedule', [AdminScheduleController::class, 'index'])->name('schedule.index');
     Route::get('/teachers', [AdminUserController::class, 'teachers'])->name('teachers.index');
     Route::get('/students', [AdminUserController::class, 'students'])->name('students.index');
     Route::get('/teachers/create', [AdminUserController::class, 'createTeacher'])->name('teachers.create');
@@ -39,6 +38,18 @@ Route::middleware(['auth', 'verified', 'role:admin'])->prefix('admin')->name('ad
     // Admin tools
     Route::post('/teachers/{user}/generate-schedule', [AdminUserController::class, 'generateSchedule'])
         ->name('teachers.generate-schedule');
+
+    // Simple class management (no curriculum complexity)
+    Route::resource('classes', AdminClassController::class)
+        ->except('show')
+        ->names('classes');
+
+    Route::post('classes/{class}/assignments', [AdminClassController::class, 'updateAssignments'])
+        ->name('classes.assignments');
+
+    Route::post('classes/{class}/schedule', [AdminClassController::class, 'storeSchedule'])->name('classes.schedule.store');
+    Route::post('classes/{class}/schedule/generate', [AdminClassController::class, 'generateRandomSchedule'])->name('classes.schedule.generate');
+    Route::post('classes/{class}/schedule/reset', [AdminClassController::class, 'resetSchedule'])->name('classes.schedule.reset');
 });
 
 Route::middleware(['auth', 'verified', 'role.teacher'])->prefix('teacher')->name('teacher.')->group(function () {

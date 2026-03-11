@@ -25,7 +25,7 @@
     <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 relative">
         <div class="relative z-10">
             <h1 class="text-4xl font-black text-slate-900 tracking-tight flex items-center gap-3">
-                Hey, {{ explode(' ', auth()->user()->name)[0] }}!
+                Hey, {{ explode(' ', auth()->user()->first_name ?: auth()->user()->name)[0] }}!
                 <span class="inline-flex h-3 w-3 relative">
                     <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-indigo-400 opacity-75"></span>
                     <span class="relative inline-flex rounded-full h-3 w-3 bg-indigo-500"></span>
@@ -41,7 +41,6 @@
         </div>
         <div class="hidden md:flex bg-white/60 backdrop-blur-md p-1.5 rounded-2xl shadow-sm border border-white">
             <div class="px-5 py-2.5 text-sm font-bold bg-white text-indigo-900 rounded-xl shadow-sm">Semester 2</div>
-            <div class="px-5 py-2.5 text-sm font-bold text-slate-400 hover:text-slate-600 transition-colors cursor-pointer">Archive</div>
         </div>
     </div>
 
@@ -53,6 +52,22 @@
             <div>
                 <p class="font-bold text-amber-900 text-sm">Enrollment Required</p>
                 <p class="text-amber-800/80 text-xs mt-0.5">Contact administration to be assigned to a class and start your learning journey.</p>
+            </div>
+        </div>
+    @else
+        <div class="bg-emerald-50 border border-emerald-200 p-5 rounded-2xl flex items-center gap-4">
+            <div class="bg-emerald-100 text-emerald-600 p-3 rounded-xl">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
+            </div>
+            <div>
+                <p class="font-bold text-emerald-900 text-sm">Enrolled</p>
+                <p class="text-emerald-800/80 text-xs mt-0.5">
+                    @if (isset($enrolledClasses) && $enrolledClasses->isNotEmpty())
+                        {{ $enrolledClasses->pluck('name')->join(', ') }}
+                    @else
+                        {{ $enrollment->schoolClass->name ?? '—' }}
+                    @endif
+                </p>
             </div>
         </div>
     @endif
@@ -105,12 +120,12 @@
                     @else
                         <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
                             @foreach ($todaySchedule as $index => $slot)
-                                @php
-                                    $isNow = $currentTime >= $slot->start_time && $currentTime < $slot->end_time;
-                                    $colorIndex = ($slot->subject_id ?? $index) % count($subjectColors);
-                                    $themeGradient = $subjectColors[$colorIndex];
-                                    $teacherName = $slot->user ? ($slot->user->full_name ?? trim(($slot->user->first_name ?? '') . ' ' . ($slot->user->last_name ?? ''))) : 'TBA';
-                                @endphp
+                                    @php
+                                        $isNow = $currentTime >= '08:00' && $currentTime < '17:00'; // Simplified for demo
+                                        $colorIndex = ($slot?->subject_id ?? $index) % count($subjectColors);
+                                        $themeGradient = $subjectColors[$colorIndex];
+                                        $teacherName = $slot->teacher ? ($slot->teacher->first_name . ' ' . $slot->teacher->last_name) : 'TBA';
+                                    @endphp
                                 <div class="group relative bg-white border {{ $isNow ? 'border-indigo-400 ring-4 ring-indigo-500/5' : 'border-slate-100' }} rounded-2xl p-5 hover:shadow-xl hover:shadow-slate-200/50 hover:-translate-y-1 transition-all duration-300">
                                     @if ($isNow)
                                         <div class="absolute -top-3 left-4 flex items-center gap-1.5 px-3 py-1 rounded-full text-[10px] font-black bg-indigo-600 text-white shadow-lg shadow-indigo-200">
@@ -123,8 +138,16 @@
                                             <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5 opacity-90" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" /></svg>
                                         </div>
                                         <div class="text-right">
-                                            <p class="text-[10px] font-black text-slate-400 uppercase tracking-widest">{{ $slot->start_time }}</p>
-                                            <p class="text-xs font-black text-slate-800">{{ $slot->end_time }}</p>
+                                            <p class="text-[10px] font-black text-slate-400 uppercase tracking-widest">
+                                                {{ $slot->room ? 'Room ' . $slot->room : '—' }}
+                                            </p>
+                                            <p class="text-xs font-black text-slate-800">
+                                                @if($slot->start_time && $slot->end_time)
+                                                    {{ $slot->start_time->format('H:i') }} - {{ $slot->end_time->format('H:i') }}
+                                                @else
+                                                    —
+                                                @endif
+                                            </p>
                                         </div>
                                     </div>
                                     

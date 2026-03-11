@@ -1,12 +1,6 @@
 @extends('layouts.teacher-app')
 
 @section('content')
-@php
-    $statMap = collect($stats)->keyBy('label');
-    $avg = $statMap->get('Avg Grade');
-    $att = $statMap->get('Attendance');
-    $pending = $statMap->get('Pending Tasks');
-@endphp
 
 <div class="flex items-end justify-between mb-8 relative">
     <div class="relative z-10">
@@ -22,42 +16,27 @@
 </div>
 
 <!-- Stats Grid -->
-<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-5 md:gap-6 mb-10">
-
+<div class="grid grid-cols-1 md:grid-cols-2 gap-5 md:gap-6 mb-10">
     <div class="group relative bg-white/60 backdrop-blur-xl p-6 rounded-3xl shadow-[0_8px_30px_rgb(0,0,0,0.04)] border border-white hover:shadow-[0_8px_30px_rgb(16,185,129,0.15)] transition-all duration-300 hover:-translate-y-1 overflow-hidden">
         <div class="absolute -right-6 -top-6 w-24 h-24 bg-emerald-100 rounded-full blur-2xl opacity-50 group-hover:opacity-100 transition-opacity"></div>
         <div class="flex justify-between items-start mb-4 relative z-10">
             <div class="bg-gradient-to-br from-emerald-400 to-emerald-600 text-white p-3.5 rounded-2xl shadow-lg shadow-emerald-200/50">
-                <svg xmlns="http://www.w3.org/2000/svg" class="w-6 h-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="23 6 13.5 15.5 8.5 10.5 1 18"/><polyline points="17 6 23 6 23 12"/></svg>
+                <svg xmlns="http://www.w3.org/2000/svg" class="w-6 h-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 7h18"/><path d="M3 12h18"/><path d="M3 17h18"/></svg>
             </div>
-            <span class="{{ $avg->trend_class ?? 'text-emerald-700 bg-emerald-100 border border-emerald-200' }} text-[11px] font-black px-2.5 py-1 rounded-full shadow-sm">{{ $avg->trend_text ?? '+0.8%' }}</span>
         </div>
-        <p class="text-xs text-slate-500 font-bold mb-1 uppercase tracking-widest relative z-10">Avg Grade</p>
-        <p class="text-3xl font-black text-slate-800 relative z-10">{{ $avg->value ?? '0%' }}</p>
+        <p class="text-xs text-slate-500 font-bold mb-1 uppercase tracking-widest relative z-10">Total Students</p>
+        <p class="text-3xl font-black text-slate-800 relative z-10">{{ $totalStudents }}</p>
     </div>
 
-    <div class="group relative bg-white/60 backdrop-blur-xl p-6 rounded-3xl shadow-[0_8px_30px_rgb(0,0,0,0.04)] border border-white hover:shadow-[0_8px_30px_rgb(139,92,246,0.15)] transition-all duration-300 hover:-translate-y-1 overflow-hidden">
-        <div class="absolute -right-6 -top-6 w-24 h-24 bg-violet-100 rounded-full blur-2xl opacity-50 group-hover:opacity-100 transition-opacity"></div>
+    <div class="group relative bg-white/60 backdrop-blur-xl p-6 rounded-3xl shadow-[0_8px_30px_rgb(0,0,0,0.04)] border border-white hover:shadow-[0_8px_30px_rgb(99,102,241,0.15)] transition-all duration-300 hover:-translate-y-1 overflow-hidden">
+        <div class="absolute -right-6 -top-6 w-24 h-24 bg-indigo-100 rounded-full blur-2xl opacity-50 group-hover:opacity-100 transition-opacity"></div>
         <div class="flex justify-between items-start mb-4 relative z-10">
-            <div class="bg-gradient-to-br from-violet-400 to-violet-600 text-white p-3.5 rounded-2xl shadow-lg shadow-violet-200/50">
-                <svg xmlns="http://www.w3.org/2000/svg" class="w-6 h-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
+            <div class="bg-gradient-to-br from-indigo-400 to-indigo-600 text-white p-3.5 rounded-2xl shadow-lg shadow-indigo-200/50">
+                <svg xmlns="http://www.w3.org/2000/svg" class="w-6 h-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19.5v-15A2.5 2.5 0 0 1 6.5 2H20v20H6.5a2.5 2.5 0 0 1-2.5-2.5Z"/><path d="M8 7h6"/><path d="M8 11h8"/></svg>
             </div>
-            <span class="{{ $att->trend_class ?? 'text-slate-600 bg-slate-100 border border-slate-200' }} text-[11px] font-black px-2.5 py-1 rounded-full shadow-sm">{{ $att->trend_text ?? 'Stable' }}</span>
         </div>
-        <p class="text-xs text-slate-500 font-bold mb-1 uppercase tracking-widest relative z-10">Attendance</p>
-        <p class="text-3xl font-black text-slate-800 relative z-10">{{ $att->value ?? '0%' }}</p>
-    </div>
-
-    <div class="group relative bg-white/60 backdrop-blur-xl p-6 rounded-3xl shadow-[0_8px_30px_rgb(0,0,0,0.04)] border border-white hover:shadow-[0_8px_30px_rgb(245,158,11,0.15)] transition-all duration-300 hover:-translate-y-1 overflow-hidden">
-        <div class="absolute -right-6 -top-6 w-24 h-24 bg-amber-100 rounded-full blur-2xl opacity-50 group-hover:opacity-100 transition-opacity"></div>
-        <div class="flex justify-between items-start mb-4 relative z-10">
-            <div class="bg-gradient-to-br from-amber-400 to-amber-500 text-white p-3.5 rounded-2xl shadow-lg shadow-amber-200/50">
-                <svg xmlns="http://www.w3.org/2000/svg" class="w-6 h-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" x2="12" y1="8" y2="12"/><line x1="12" x2="12.01" y1="16" y2="16"/></svg>
-            </div>
-            <span class="{{ $pending->trend_class ?? 'text-rose-700 bg-rose-100 border border-rose-200' }} text-[11px] font-black px-2.5 py-1 rounded-full shadow-sm">{{ $pending->trend_text ?? '-2' }}</span>
-        </div>
-        <p class="text-xs text-slate-500 font-bold mb-1 uppercase tracking-widest relative z-10">Pending Tasks</p>
-        <p class="text-3xl font-black text-slate-800 relative z-10">{{ $pending->value ?? '0' }}</p>
+        <p class="text-xs text-slate-500 font-bold mb-1 uppercase tracking-widest relative z-10">Lessons Today</p>
+        <p class="text-3xl font-black text-slate-800 relative z-10">{{ $lessonsTodayCount }}</p>
     </div>
 </div>
 
@@ -146,8 +125,11 @@
                             @endif
                         </div>
                         <p class="text-sm font-bold text-slate-800 group-hover:text-indigo-600 transition-colors">{{ $sub->student }}</p>
-                        <p class="text-xs text-slate-500 mt-1 font-medium">Submitted <span class="text-slate-700">{{ $sub->assignment }}</span></p>
-                        <span class="text-[10px] px-2.5 py-1 {{ $sub->status === 'Graded' ? 'bg-emerald-50 text-emerald-700 border border-emerald-100' : 'bg-amber-50 text-amber-700 border border-amber-100' }} rounded-md font-black uppercase mt-2.5 inline-block tracking-wider">{{ $sub->status }}</span>
+                        <p class="text-xs text-slate-500 mt-1 font-medium">Submitted <span class="text-slate-700">{{ $sub->assignment }}</span> ({{ $sub->score }})</p>
+                        <div class="flex items-center justify-between mt-2.5">
+                            <span class="text-[10px] px-2.5 py-1 {{ $sub->status === 'Graded' ? 'bg-emerald-50 text-emerald-700 border border-emerald-100' : 'bg-amber-50 text-amber-700 border border-amber-100' }} rounded-md font-black uppercase tracking-wider">{{ $sub->status }}</span>
+                            <span class="text-[10px] text-slate-400 font-bold uppercase tracking-widest">{{ $sub->date }}</span>
+                        </div>
                     </div>
                 @empty
                     <div class="py-4 text-center">
@@ -160,32 +142,71 @@
             </a>
         </div>
 
-        <!-- Deadlines -->
-        <div class="bg-white/80 backdrop-blur-xl rounded-3xl shadow-[0_8px_30px_rgb(0,0,0,0.04)] border border-white p-7">
-            <h2 class="text-xl font-black text-slate-800 mb-6 flex items-center gap-2">
-                Upcoming Deadlines
-                <span class="flex h-2 w-2 relative">
-                    <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-rose-400 opacity-75"></span>
-                    <span class="relative inline-flex rounded-full h-2 w-2 bg-rose-500"></span>
-                </span>
-            </h2>
-            <div class="space-y-4">
-                <div class="group p-5 bg-gradient-to-br from-amber-50/80 to-amber-100/50 rounded-2xl border border-amber-200/60 flex items-start gap-4 hover:shadow-md transition-all duration-300 hover:-translate-y-1">
-                    <div class="bg-amber-100 p-3.5 rounded-xl shadow-sm border border-amber-200 shrink-0 group-hover:scale-105 transition-transform">
-                        <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5 text-amber-700" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" x2="12" y1="8" y2="12"/><line x1="12" x2="12.01" y1="16" y2="16"/></svg>
+        <!-- Smart Tips / Reminders -->
+        <div class="relative group mt-2">
+            <!-- Subtle Animated Background Glow -->
+            <div class="absolute -inset-1 bg-gradient-to-r from-indigo-100 to-purple-100 rounded-[2.5rem] blur opacity-40 group-hover:opacity-60 transition duration-1000 group-hover:duration-200"></div>
+            
+            <div class="relative bg-white/80 backdrop-blur-xl rounded-[2.25rem] p-8 overflow-hidden shadow-[0_8px_30px_rgb(0,0,0,0.04)] border border-white">
+                <!-- Mesh Gradient Background (Light) -->
+                <div class="absolute inset-0 bg-[radial-gradient(circle_at_40%_0%,rgba(129,140,248,0.08),transparent_50%),radial-gradient(circle_at_80%_90%,rgba(139,92,246,0.05),transparent_50%)]"></div>
+                
+                <div class="relative z-10 space-y-8">
+                    <!-- Header -->
+                    <div class="flex items-center justify-between">
+                        <div class="space-y-1">
+                            <div class="flex items-center gap-2">
+                                <span class="bg-indigo-50 text-indigo-600 text-[10px] font-black uppercase tracking-[0.2em] px-2.5 py-1 rounded-full border border-indigo-100">AI Insights</span>
+                            </div>
+                            <h2 class="text-2xl font-black tracking-tight text-slate-800 leading-tight">Stay ahead of <br/><span class="text-indigo-600">your classes</span></h2>
+                        </div>
+                        <div class="p-3 bg-slate-50 rounded-2xl border border-slate-100">
+                            <div class="flex h-2.5 w-2.5 relative">
+                                <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
+                                <span class="relative inline-flex rounded-full h-2.5 w-2.5 bg-emerald-500 shadow-[0_0_10px_rgba(16,185,129,0.3)]"></span>
+                            </div>
+                        </div>
                     </div>
-                    <div class="min-w-0 flex-1">
-                        <h4 class="font-bold text-amber-900 text-sm">Grading Deadline</h4>
-                        <p class="text-[13px] text-amber-800/80 font-medium mt-1.5 leading-relaxed">Keep gradebooks updated for quarterly reporting.</p>
+
+                    <!-- Tips Grid -->
+                    <div class="space-y-4">
+                        <!-- Attendance Tip -->
+                        <div class="group/item relative">
+                            <div class="relative p-5 rounded-2xl border {{ $attendanceMarked ? 'border-emerald-100 bg-emerald-50/50' : 'border-rose-100 bg-rose-50/50' }} flex items-start gap-4 transition-all duration-300 hover:translate-x-1">
+                                <div class="w-11 h-11 rounded-xl flex items-center justify-center shrink-0 shadow-sm {{ $attendanceMarked ? 'bg-white text-emerald-500 border border-emerald-100' : 'bg-white text-rose-500 border border-rose-100' }}">
+                                    <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg>
+                                </div>
+                                <div class="min-w-0">
+                                    <h4 class="font-bold text-sm tracking-wide mb-1.5 {{ $attendanceMarked ? 'text-emerald-700' : 'text-rose-700' }}">Attendance Flow</h4>
+                                    <p class="text-[12px] leading-relaxed font-semibold {{ $attendanceMarked ? 'text-slate-500' : 'text-rose-600/80' }}">
+                                        {{ $attendanceMarked ? 'Brilliant! Your attendance book is fully up to date for today.' : 'Quick reminder: Some of today’s classes are still waiting for attendance updates.' }}
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Exam Results Tip -->
+                        <div class="group/item relative">
+                            <div class="relative p-5 rounded-2xl border border-amber-100 bg-amber-50/50 flex items-start gap-4 transition-all duration-300 hover:translate-x-1">
+                                <div class="w-11 h-11 rounded-xl bg-white text-amber-500 border border-amber-100 flex items-center justify-center shrink-0 shadow-sm">
+                                    <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M14.5 2H6A2 2 0 0 0 4 4v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7.5Z"/><path d="M14 2v6h6"/><path d="M9 13h6"/><path d="M9 17h3"/></svg>
+                                </div>
+                                <div class="min-w-0">
+                                    <h4 class="font-bold text-sm text-amber-700 tracking-wide mb-1.5">Grading Pulse</h4>
+                                    <p class="text-[12px] leading-relaxed font-semibold text-slate-500">
+                                        Check the latest exam attempts. A few students might need a gentle push to reach their targets.
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
                     </div>
-                </div>
-                <div class="group p-5 bg-gradient-to-br from-blue-50/80 to-blue-100/50 rounded-2xl border border-blue-200/60 flex items-start gap-4 hover:shadow-md transition-all duration-300 hover:-translate-y-1">
-                    <div class="bg-blue-100 p-3.5 rounded-xl shadow-sm border border-blue-200 shrink-0 group-hover:scale-105 transition-transform">
-                        <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5 text-blue-700" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 0 0 2.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 0 0 1.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 0 0-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 0 0-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 0 0-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 0 0-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 0 0 1.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065Z"/><path d="M15 12a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z"/></svg>
-                    </div>
-                    <div class="min-w-0 flex-1">
-                        <h4 class="font-bold text-blue-900 text-sm">Attendance</h4>
-                        <p class="text-[13px] text-blue-800/80 font-medium mt-1.5 leading-relaxed">Remember to mark attendance for all classes today.</p>
+
+                    <!-- Action Button -->
+                    <div class="pt-2">
+                        <a href="{{ route('teacher.attendance.index') }}" class="group/btn relative flex items-center justify-center gap-3 w-full py-4 rounded-2xl bg-indigo-600 text-white text-[11px] font-black uppercase tracking-[0.25em] transition-all hover:-translate-y-1 active:translate-y-0 shadow-lg shadow-indigo-200 hover:shadow-indigo-300">
+                            <span>Optimize Workspace</span>
+                            <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4 transition-transform group-hover/btn:translate-x-1" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14m-7-7 7 7-7 7"/></svg>
+                        </a>
                     </div>
                 </div>
             </div>

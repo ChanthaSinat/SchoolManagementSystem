@@ -5,9 +5,6 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Admin\UpdateUserRequest;
 use App\Http\Requests\Admin\StoreUserRequest;
-use App\Models\Enrollment;
-use App\Models\SchoolClass;
-use App\Models\TeacherClass;
 use App\Models\User;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -88,17 +85,11 @@ class UserController extends Controller
             abort(404);
         }
 
-        $schoolClasses = SchoolClass::with('sections')->orderBy('name')->get();
-        $teacherClassIds = $user->teacherClasses()->pluck('school_class_id')->all();
-
         return view('admin.users.edit', [
             'user' => $user,
             'roleLabel' => __('Teacher'),
             'listRoute' => 'admin.teachers.index',
             'listLabel' => __('Teachers'),
-            'schoolClasses' => $schoolClasses,
-            'teacherClassIds' => $teacherClassIds,
-            'enrollment' => null,
         ]);
     }
 
@@ -108,17 +99,11 @@ class UserController extends Controller
             abort(404);
         }
 
-        $schoolClasses = SchoolClass::with('sections')->orderBy('name')->get();
-        $enrollment = Enrollment::where('student_id', $user->id)->where('status', 'active')->with(['schoolClass', 'section'])->first();
-
         return view('admin.users.edit', [
             'user' => $user,
             'roleLabel' => __('Student'),
             'listRoute' => 'admin.students.index',
             'listLabel' => __('Students'),
-            'schoolClasses' => $schoolClasses,
-            'teacherClassIds' => [],
-            'enrollment' => $enrollment,
         ]);
     }
 
@@ -136,52 +121,6 @@ class UserController extends Controller
         }
 
         $user->save();
-
-        if ($user->role === 'teacher' || $user->hasRole('teacher')) {
-            $classIds = $request->input('class_ids', []);
-            $classIds = is_array($classIds) ? array_filter(array_map('intval', $classIds)) : [];
-
-            // Ensure referenced classes exist
-            $validClassIds = SchoolClass::whereIn('id', $classIds)->pluck('id')->all();
-
-            TeacherClass::where('teacher_id', $user->id)->delete();
-            foreach ($validClassIds as $schoolClassId) {
-                TeacherClass::firstOrCreate(
-                    ['teacher_id' => $user->id, 'school_class_id' => $schoolClassId],
-                    ['teacher_id' => $user->id, 'school_class_id' => $schoolClassId]
-                );
-            }
-        }
-
-        if ($user->role === 'student' || $user->hasRole('student')) {
-            $schoolClassId = $request->input('school_class_id') ? (int) $request->input('school_class_id') : null;
-            $sectionId = $request->input('section_id') ? (int) $request->input('section_id') : null;
-
-            Enrollment::where('student_id', $user->id)->update(['status' => 'inactive']);
-
-            if ($schoolClassId && $sectionId) {
-                // Ensure the selected class exists before creating/updating enrollment
-                if (! SchoolClass::whereKey($schoolClassId)->exists()) {
-                    return redirect()
-                        ->back()
-                        ->withInput()
-                        ->with('error', __('Selected class is invalid.'));
-                }
-
-                Enrollment::updateOrCreate(
-                    [
-                        'student_id' => $user->id,
-                        'school_class_id' => $schoolClassId,
-                        'section_id' => $sectionId,
-                    ],
-                    [
-                        'status' => 'active',
-                        'roll_number' => $request->input('roll_number') ? (int) $request->input('roll_number') : null,
-                        'guardian_phone' => $request->input('guardian_phone'),
-                    ]
-                );
-            }
-        }
 
         $route = ($user->role === 'teacher' || $user->hasRole('teacher')) ? 'admin.teachers.index' : 'admin.students.index';
 
@@ -219,12 +158,8 @@ class UserController extends Controller
                 ->with('error', __('Selected user is not a teacher.'));
         }
 
-        Artisan::call('schedule:random-teacher', [
-            'teacherId' => $user->id,
-        ]);
-
         return redirect()
             ->route('admin.teachers.index')
-            ->with('success', __('Random schedule generated for :name.', ['name' => $user->name]));
+            ->with('error', __('The legacy schedule system has been removed. Schedule generation is currently disabled.'));
     }
 }

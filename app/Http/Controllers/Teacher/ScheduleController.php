@@ -3,7 +3,7 @@
 namespace App\Http\Controllers\Teacher;
 
 use App\Http\Controllers\Controller;
-use App\Models\Timetable;
+use App\Models\ClassSchedule;
 use Illuminate\View\View;
 
 class ScheduleController extends Controller
@@ -11,12 +11,12 @@ class ScheduleController extends Controller
     public function index(): View
     {
         $teacherId = auth()->id();
-        $timetable = Timetable::where('user_id', $teacherId)
-            ->with(['subject', 'schoolClass', 'section'])
-            ->orderBy('day_of_week')
-            ->orderBy('start_time')
+        $schedule = ClassSchedule::where('teacher_id', $teacherId)
+            ->with(['subject', 'schoolClass'])
+            ->orderBy('weekday')
+            ->orderBy('period')
             ->get()
-            ->groupBy('day_of_week');
+            ->groupBy('weekday');
 
         $days = ['monday', 'tuesday', 'wednesday', 'thursday', 'friday'];
         $currentDay = strtolower(now()->format('l'));
@@ -24,10 +24,6 @@ class ScheduleController extends Controller
             $currentDay = 'monday';
         }
 
-        return view('teacher.schedule.index', [
-            'timetable' => $timetable,
-            'days' => $days,
-            'currentDay' => $currentDay,
-        ]);
+        return view('teacher.schedule.index', compact('schedule', 'days', 'currentDay'));
     }
 }

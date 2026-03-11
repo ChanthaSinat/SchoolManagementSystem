@@ -14,9 +14,7 @@
             <thead class="bg-slate-100/90 border-b border-slate-200/80">
                 <tr>
                     <th class="px-6 py-4 text-xs font-bold text-slate-600 uppercase tracking-wider">{{ __('Name') }}</th>
-                    <th class="px-6 py-4 text-xs font-bold text-slate-600 uppercase tracking-wider">{{ __('Roll No.') }}</th>
                     <th class="px-6 py-4 text-xs font-bold text-slate-600 uppercase tracking-wider">{{ __('Class') }}</th>
-                    <th class="px-6 py-4 text-xs font-bold text-slate-600 uppercase tracking-wider">{{ __('Section') }}</th>
                 </tr>
             </thead>
             <tbody class="divide-y divide-slate-200/80">
@@ -26,13 +24,11 @@
                             @php $fullName = trim($row->user->full_name); @endphp
                             <span class="font-semibold text-slate-800">{{ $fullName ?: ($row->user->name ?? __('—')) }}</span>
                         </td>
-                        <td class="px-6 py-4 text-sm text-slate-600">{{ $row->roll_number ?? '—' }}</td>
-                        <td class="px-6 py-4 text-sm text-slate-600">{{ $row->class_names ?: '—' }}</td>
-                        <td class="px-6 py-4 text-sm text-slate-600">{{ $row->section_names ?: '—' }}</td>
+                        <td class="px-6 py-4 text-sm text-slate-600">{{ $row->class_names ?? '—' }}</td>
                     </tr>
                 @empty
                     <tr>
-                        <td colspan="4" class="px-6 py-12 text-center text-slate-600 font-medium text-sm">
+                        <td colspan="2" class="px-6 py-12 text-center text-slate-600 font-medium text-sm">
                             {{ __('No students found in your classes.') }}
                         </td>
                     </tr>

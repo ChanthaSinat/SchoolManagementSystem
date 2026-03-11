@@ -35,11 +35,6 @@
                     Dashboard
                 </a>
 
-                <a href="{{ route('admin.schedule.index') }}" class="flex items-center w-full px-4 py-3.5 rounded-xl {{ request()->routeIs('admin.schedule.*') ? 'bg-indigo-600 text-white shadow-lg shadow-indigo-600/30' : 'text-slate-400 hover:bg-slate-800 hover:text-white' }} font-bold text-sm transition-all group">
-                    <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5 mr-3 {{ request()->routeIs('admin.schedule.*') ? 'text-white' : 'text-slate-500 group-hover:text-indigo-400' }} transition-colors" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="18" height="18" x="3" y="4" rx="2" ry="2"/><line x1="16" x2="16" y1="2" y2="6"/><line x1="8" x2="8" y1="2" y2="6"/><line x1="3" x2="21" y1="10" y2="10"/></svg>
-                    Class Schedule
-                </a>
-
                 <a href="{{ route('admin.teachers.index') }}" class="flex items-center w-full px-4 py-3.5 rounded-xl {{ request()->routeIs('admin.teachers.*') ? 'bg-indigo-600 text-white shadow-lg shadow-indigo-600/30' : 'text-slate-400 hover:bg-slate-800 hover:text-white' }} font-bold text-sm transition-all group">
                     <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5 mr-3 {{ request()->routeIs('admin.teachers.*') ? 'text-white' : 'text-slate-500 group-hover:text-indigo-400' }} transition-colors" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
                     Teachers
@@ -48,6 +43,11 @@
                 <a href="{{ route('admin.students.index') }}" class="flex items-center w-full px-4 py-3.5 rounded-xl {{ request()->routeIs('admin.students.*') ? 'bg-indigo-600 text-white shadow-lg shadow-indigo-600/30' : 'text-slate-400 hover:bg-slate-800 hover:text-white' }} font-bold text-sm transition-all group">
                     <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5 mr-3 {{ request()->routeIs('admin.students.*') ? 'text-white' : 'text-slate-500 group-hover:text-indigo-400' }} transition-colors" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M17 3.13a4 4 0 0 1 0 7.75"/></svg>
                     Students
+                </a>
+
+                <a href="{{ route('admin.classes.index') }}" class="flex items-center w-full px-4 py-3.5 rounded-xl {{ request()->routeIs('admin.classes.*') ? 'bg-slate-800 text-white' : 'text-slate-400 hover:bg-slate-800 hover:text-white' }} font-bold text-sm transition-all group">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5 mr-3 {{ request()->routeIs('admin.classes.*') ? 'text-indigo-300' : 'text-slate-500 group-hover:text-indigo-400' }} transition-colors" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="7" height="7" rx="1"/><rect x="14" y="4" width="7" height="7" rx="1"/><rect x="14" y="13" width="7" height="7" rx="1"/><rect x="3" y="13" width="7" height="7" rx="1"/></svg>
+                    Classes
                 </a>
             </nav>
 

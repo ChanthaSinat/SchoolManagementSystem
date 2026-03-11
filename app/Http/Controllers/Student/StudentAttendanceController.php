@@ -4,8 +4,6 @@ namespace App\Http\Controllers\Student;
 
 use App\Http\Controllers\Controller;
 use App\Models\Attendance;
-use App\Models\Enrollment;
-use Carbon\Carbon;
 use Illuminate\View\View;
 
 class StudentAttendanceController extends Controller
@@ -13,38 +11,41 @@ class StudentAttendanceController extends Controller
     public function index(): View
     {
         $student = auth()->user();
-        $enrollment = Enrollment::where('student_id', $student->id)
-            ->where('status', 'active')
-            ->first();
+        $enrolledClasses = $student->schoolClasses()->with(['schoolType', 'academicYear', 'semester'])->get();
 
-        if (! $enrollment) {
-            return view('student.attendance.index', [
-                'enrollment' => null,
-                'attendances' => collect(),
-                'byMonth' => collect(),
-                'attendanceByDate' => [],
-                'total' => 0,
-                'present' => 0,
-                'absent' => 0,
-                'late' => 0,
-                'rate' => 0,
-            ]);
-        }
+        $enrollment = $enrolledClasses->isNotEmpty()
+            ? (object) ['schoolClass' => $enrolledClasses->first()]
+            : null;
 
+        // Load this student's attendance records
         $attendances = Attendance::where('student_id', $student->id)
-            ->where('school_class_id', $enrollment->school_class_id)
-            ->orderByDesc('date')
+            ->orderBy('date', 'desc')
             ->get();
 
         $total = $attendances->count();
         $present = $attendances->where('status', 'present')->count();
         $absent = $attendances->where('status', 'absent')->count();
         $late = $attendances->where('status', 'late')->count();
-        $rate = $total > 0 ? round(($present / $total) * 100) : 0;
 
-        $byMonth = $attendances->groupBy(fn ($a) => Carbon::parse($a->date)->format('Y-m'));
+        $rate = $total > 0
+            ? (int) round((($present + $late) / $total) * 100)
+            : 0;
 
-        $attendanceByDate = $attendances->keyBy(fn ($a) => $a->date->format('Y-m-d'))->map(fn ($a) => $a->status)->all();
+        // Build per-date status map for calendar (absent > late > present)
+        $attendanceByDate = [];
+        foreach ($attendances as $a) {
+            $key = $a->date->toDateString();
+            $current = $attendanceByDate[$key] ?? null;
+
+            if ($a->status === 'absent'
+                || ($a->status === 'late' && $current !== 'absent')
+                || ($a->status === 'present' && $current === null)
+            ) {
+                $attendanceByDate[$key] = $a->status;
+            }
+        }
+
+        $byMonth = $attendances->groupBy(fn ($a) => $a->date->format('Y-m'));
 
         return view('student.attendance.index', [
             'enrollment' => $enrollment,

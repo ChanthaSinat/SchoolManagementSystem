@@ -30,4 +30,9 @@ class AcademicYear extends Model
     {
         return $this->hasMany(SchoolClass::class, 'academic_year_id');
     }
+
+    public function semesters(): HasMany
+    {
+        return $this->hasMany(Semester::class);
+    }
 }

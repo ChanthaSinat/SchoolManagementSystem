@@ -6,6 +6,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class SchoolClass extends Model
 {
@@ -14,15 +15,27 @@ class SchoolClass extends Model
     protected $table = 'school_classes';
 
     protected $fillable = [
+        'school_type_id',
         'academic_year_id',
         'name',
         'year_level',
-        'semester',
+        'section',
+        'semester_id',
     ];
 
     public function academicYear(): BelongsTo
     {
         return $this->belongsTo(AcademicYear::class);
+    }
+
+    public function schoolType(): BelongsTo
+    {
+        return $this->belongsTo(SchoolType::class);
+    }
+
+    public function semester(): BelongsTo
+    {
+        return $this->belongsTo(Semester::class);
     }
 
     public function sections(): BelongsToMany
@@ -33,12 +46,20 @@ class SchoolClass extends Model
 
     public function subjects(): BelongsToMany
     {
-        return $this->belongsToMany(Subject::class, 'class_subject', 'class_id', 'subject_id')
+        return $this->belongsToMany(Subject::class, 'class_subject', 'school_class_id', 'subject_id')
+            ->withPivot('teacher_id')
             ->withTimestamps();
     }
 
-    public function teacherClasses(): \Illuminate\Database\Eloquent\Relations\HasMany
+    public function students(): BelongsToMany
     {
-        return $this->hasMany(TeacherClass::class, 'school_class_id');
+        return $this->belongsToMany(User::class, 'class_student', 'school_class_id', 'student_id')
+            ->withPivot(['status', 'roll_number'])
+            ->withTimestamps();
+    }
+
+    public function schedules(): HasMany
+    {
+        return $this->hasMany(ClassSchedule::class, 'school_class_id');
     }
 }

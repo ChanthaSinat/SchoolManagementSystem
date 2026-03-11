@@ -3,64 +3,67 @@
 namespace App\Http\Controllers\Teacher;
 
 use App\Http\Controllers\Controller;
-use App\Jobs\NotifyAbsentParents;
+use App\Models\ClassSchedule;
 use App\Models\Attendance;
-use App\Models\Enrollment;
 use App\Models\SchoolClass;
 use App\Models\Section;
-use App\Models\TeacherClass;
+use Illuminate\Support\Facades\Schema;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Schema;
 use Illuminate\View\View;
 
 class AttendanceController extends Controller
 {
     public function index(): View
     {
-        $teacherClasses = TeacherClass::where('teacher_id', auth()->id())
-            ->with(['schoolClass.sections'])
-            ->get();
+        $teacherId = auth()->id();
 
-        $classes = $teacherClasses->map(fn ($tc) => $tc->schoolClass)->filter()->unique('id')->values();
-
-        $fourteenDaysAgo = now()->subDays(14)->toDateString();
-        $records = Attendance::where('teacher_id', auth()->id())
-            ->where('date', '>=', $fourteenDaysAgo)
-            ->with(['schoolClass', 'section'])
-            ->orderByDesc('date')
-            ->get();
-
-        $history = $records->groupBy(fn ($r) => "{$r->date->toDateString()}-{$r->school_class_id}-{$r->section_id}")
-            ->map(function ($group) {
-                $first = $group->first();
-                $present = $group->where('status', 'present')->count();
-                $absent = $group->where('status', 'absent')->count();
-                $late = $group->where('status', 'late')->count();
-                $total = $group->count();
-                $rate = $total > 0 ? round((($present + $late) / $total) * 100) : 0;
-
-                return (object) [
-                    'date' => $first->date,
-                    'school_class_id' => $first->school_class_id,
-                    'section_id' => $first->section_id,
-                    'class_name' => $first->schoolClass?->name,
-                    'section_name' => $first->section?->name,
-                    'present' => $present,
-                    'absent' => $absent,
-                    'late' => $late,
-                    'rate' => $rate,
-                ];
-            })
-            ->values()
-            ->sortByDesc('date')
+        // Classes this teacher teaches, based on the weekly schedule
+        $classIds = ClassSchedule::where('teacher_id', $teacherId)
+            ->pluck('school_class_id')
+            ->unique()
             ->values();
 
-        return view('teacher.attendance.index', [
-            'classes' => $classes,
-            'history' => $history,
-        ]);
+        $classes = \App\Models\SchoolClass::whereIn('id', $classIds)->get();
+
+        // Recent attendance history (last 14 days) for these classes, if table exists
+        $history = collect();
+        if ($classIds->isNotEmpty() && Schema::hasTable('attendances')) {
+            $fourteenDaysAgo = now()->subDays(14)->toDateString();
+            $records = Attendance::where('teacher_id', $teacherId)
+                ->whereIn('school_class_id', $classIds)
+                ->where('date', '>=', $fourteenDaysAgo)
+                ->with(['schoolClass', 'section'])
+                ->orderByDesc('date')
+                ->get();
+
+            $history = $records->groupBy(fn ($r) => "{$r->date->toDateString()}-{$r->school_class_id}-{$r->section_id}")
+                ->map(function ($group) {
+                    $first = $group->first();
+                    $present = $group->where('status', 'present')->count();
+                    $absent = $group->where('status', 'absent')->count();
+                    $late = $group->where('status', 'late')->count();
+                    $total = $group->count();
+                    $rate = $total > 0 ? round((($present + $late) / $total) * 100) : 0;
+
+                    return (object) [
+                        'date' => $first->date,
+                        'school_class_id' => $first->school_class_id,
+                        'section_id' => $first->section_id,
+                        'class_name' => $first->schoolClass?->name,
+                        'section_name' => $first->section?->name ?? 'A',
+                        'present' => $present,
+                        'absent' => $absent,
+                        'late' => $late,
+                        'rate' => $rate,
+                    ];
+                })
+                ->values()
+                ->sortByDesc('date')
+                ->values();
+        }
+
+        return view('teacher.attendance.index', compact('classes', 'history'));
     }
 
     public function history(): RedirectResponse
@@ -70,50 +73,49 @@ class AttendanceController extends Controller
 
     public function showMarkForm(Request $request): View|RedirectResponse
     {
-        $classId = $request->query('class_id');
-        $sectionId = $request->query('section_id');
+        $classId = (int) $request->query('class_id');
         $date = $request->query('date');
 
-        if (! $classId || ! $sectionId || ! $date) {
+        if (! $classId || ! $date) {
             return redirect()->route('teacher.attendance.index')
-                ->with('error', 'Please select class, section, and date.');
+                ->with('error', 'Please select class and date.');
         }
 
         $schoolClass = SchoolClass::find($classId);
-        $section = Section::find($sectionId);
-
-        if (! $schoolClass || ! $section) {
-            return redirect()->route('teacher.attendance.index')->with('error', 'Invalid class or section.');
+        if (! $schoolClass) {
+            return redirect()->route('teacher.attendance.index')
+                ->with('error', 'Invalid class.');
         }
 
-        $students = Enrollment::where('school_class_id', $classId)
-            ->where('section_id', $sectionId)
-            ->where('status', 'active')
-            ->with('user')
-            ->orderBy('roll_number')
+        // Single default section for simplified Grade 12 setup
+        $section = Section::firstOrCreate(['name' => 'A']);
+        $sectionId = $section->id;
+
+        // Students enrolled in this class via class_student
+        $students = $schoolClass->students()
+            ->wherePivot('status', 'active')
             ->get()
-            // Ensure only real students appear (never admins)
-            ->filter(function (Enrollment $enrollment) {
-                $user = $enrollment->user;
-                if (! $user) {
-                    return false;
-                }
-
-                // Exclude any admin
-                if ($user->role === 'admin' || $user->hasRole('admin')) {
-                    return false;
-                }
-
-                // Only include users who are students
-                return $user->role === 'student' || $user->hasRole('student');
+            ->filter(function ($student) {
+                // Exclude admins
+                return ! ($student->role === 'admin' || $student->hasRole('admin'));
+            })
+            ->map(function ($student) {
+                return (object) [
+                    'student_id' => $student->id,
+                    'user' => $student,
+                    'roll_number' => $student->pivot->roll_number,
+                ];
             })
             ->values();
 
-        $existing = Attendance::where('school_class_id', $classId)
-            ->where('section_id', $sectionId)
-            ->where('date', $date)
-            ->get()
-            ->keyBy('student_id');
+        $existing = collect();
+        if (Schema::hasTable('attendances')) {
+            $existing = Attendance::where('school_class_id', $classId)
+                ->where('section_id', $sectionId)
+                ->whereDate('date', $date)
+                ->get()
+                ->keyBy('student_id');
+        }
 
         return view('teacher.attendance.mark', [
             'students' => $students,
@@ -128,66 +130,63 @@ class AttendanceController extends Controller
 
     public function store(Request $request): RedirectResponse
     {
-        $validated = $request->validate([
+        if (! Schema::hasTable('attendances')) {
+            return redirect()
+                ->route('teacher.attendance.index')
+                ->with('error', 'Attendance table is missing. Please run php artisan migrate to enable attendance tracking.');
+        }
+
+        $data = $request->validate([
             'class_id' => ['required', 'exists:school_classes,id'],
-            'section_id' => ['required', 'exists:sections,id'],
             'date' => ['required', 'date', 'before_or_equal:today'],
             'attendance' => ['required', 'array'],
             'attendance.*.status' => ['required', 'in:present,absent,late'],
             'attendance.*.note' => ['nullable', 'string', 'max:500'],
         ]);
 
-        $classId = (int) $validated['class_id'];
-        $sectionId = (int) $validated['section_id'];
-        $date = $validated['date'];
+        $classId = (int) $data['class_id'];
+        $date = $data['date'];
+
+        $schoolClass = SchoolClass::findOrFail($classId);
         $teacherId = auth()->id();
 
-        $absentStudentIds = [];
+        // Single default section
+        $section = Section::firstOrCreate(['name' => 'A']);
+        $sectionId = $section->id;
 
-        // Remove any existing records for this class/section/date so we can safely recreate them
-        Attendance::where('school_class_id', $classId)
-            ->where('section_id', $sectionId)
-            ->whereDate('date', $date)
-            ->delete();
+        $counts = [
+            'present' => 0,
+            'absent' => 0,
+            'late' => 0,
+            'total' => 0,
+        ];
 
-        foreach ($validated['attendance'] as $studentId => $row) {
-            $status = $row['status'] ?? 'present';
-            $note = $row['note'] ?? null;
+        \Illuminate\Support\Facades\DB::transaction(function () use ($data, $classId, $sectionId, $date, $teacherId, &$counts) {
+            Attendance::where('school_class_id', $classId)
+                ->where('section_id', $sectionId)
+                ->whereDate('date', $date)
+                ->delete();
 
-            if ($status === 'absent') {
-                $absentStudentIds[] = (int) $studentId;
+            foreach ($data['attendance'] as $studentId => $row) {
+                $status = $row['status'] ?? 'present';
+                $note = $row['note'] ?? null;
+
+                Attendance::create([
+                    'student_id' => $studentId,
+                    'school_class_id' => $classId,
+                    'section_id' => $sectionId,
+                    'date' => $date,
+                    'status' => $status,
+                    'note' => $note,
+                    'teacher_id' => $teacherId,
+                ]);
+
+                $counts[$status]++;
+                $counts['total']++;
             }
+        });
 
-            Attendance::create([
-                'student_id' => $studentId,
-                'school_class_id' => $classId,
-                'section_id' => $sectionId,
-                'date' => $date,
-                'status' => $status,
-                'note' => $note,
-                'teacher_id' => $teacherId,
-            ]);
-        }
-
-        if (count($absentStudentIds) > 0) {
-            NotifyAbsentParents::dispatch($absentStudentIds, $date, $classId);
-        }
-
-        $schoolClass = SchoolClass::find($classId);
-        $section = Section::find($sectionId);
-        $presentCount = collect($validated['attendance'])->where('status', 'present')->count();
-        $absentCount = collect($validated['attendance'])->where('status', 'absent')->count();
-        $lateCount = collect($validated['attendance'])->where('status', 'late')->count();
-
-        if (function_exists('activity') && Schema::hasTable('activity_log')) {
-            activity()
-                ->causedBy(auth()->user())
-                ->log("Marked attendance for {$schoolClass->name} {$section->name} on {$date} — {$presentCount} present, {$absentCount} absent, {$lateCount} late.");
-        }
-
-        $total = count($validated['attendance']);
-        session()->flash('success', "Attendance saved for {$total} students.");
-
-        return redirect()->route('teacher.attendance.index');
+        return redirect()->route('teacher.attendance.index')
+            ->with('success', "Attendance saved for {$counts['total']} students.");
     }
 }
