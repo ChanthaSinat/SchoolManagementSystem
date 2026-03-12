@@ -12,6 +12,19 @@ return new class extends Migration
     public function up(): void
     {
         // Drop child tables first to satisfy foreign key constraints.
+        // Exam system tables reference subjects; drop them before dropping subjects.
+        if (Schema::hasTable('exam_attempt_answers')) {
+            Schema::drop('exam_attempt_answers');
+        }
+
+        if (Schema::hasTable('exam_attempts')) {
+            Schema::drop('exam_attempts');
+        }
+
+        if (Schema::hasTable('questions')) {
+            Schema::drop('questions');
+        }
+
         if (Schema::hasTable('timetables')) {
             Schema::drop('timetables');
         }
