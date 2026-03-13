@@ -82,12 +82,6 @@
                             </td>
                             <td class="px-8 py-5 text-right">
                                 <div class="flex items-center justify-end gap-2 transition-all duration-300">
-                                    <form action="{{ route('admin.teachers.generate-schedule', $teacher) }}" method="POST" class="inline">
-                                        @csrf
-                                        <button type="submit" class="p-2.5 bg-white text-emerald-600 border border-slate-200 rounded-xl hover:bg-emerald-600 hover:text-white hover:border-emerald-600 shadow-sm transition-all" title="Generate random timetable">
-                                            <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 4h18"/><path d="M3 10h18"/><path d="M3 16h18"/><path d="M8 2v4"/><path d="M16 8v4"/><path d="M10 14v4"/></svg>
-                                        </button>
-                                    </form>
                                     <a href="{{ route('admin.teachers.edit', $teacher) }}" class="p-2.5 bg-white text-indigo-600 border border-slate-200 rounded-xl hover:bg-indigo-600 hover:text-white hover:border-indigo-600 shadow-sm transition-all" title="Edit teacher & classes">
                                         <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 3a2.85 2.83 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5Z"/><path d="m15 5 4 4"/></svg>
                                     </a>
